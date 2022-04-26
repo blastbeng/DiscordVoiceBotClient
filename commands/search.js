@@ -48,7 +48,7 @@ module.exports = {
             } else {
                 connection = connection_old;
             }
-            interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true });
+            interaction.deferReply({ ephemeral: true});
 
             const words = interaction.options.getString('input');
 
@@ -75,7 +75,8 @@ module.exports = {
                         const resource = createAudioResource(outFile, {
                             inputType: StreamType.Arbitrary,
                         });
-                        player.play(resource);                             
+                        player.play(resource);    
+                        interaction.editReply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                             
                     });
                 })
             }).catch(function(error) {
