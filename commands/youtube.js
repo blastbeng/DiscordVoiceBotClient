@@ -13,9 +13,18 @@ const path_audio="/chatbot_music/"
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('play')
+        .setName('youtube')
         .setDescription('Il pezzente riproduce audio da un video di youtube')
-        .addStringOption(option => option.setName('input').setDescription('Il link di youtube').setRequired(true)),
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('search')
+                .setDescription('Ricerca su youtube')
+                .addStringOption(option => option.setName('input').setDescription('Il testo da cercare').setRequired(true)))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('link')
+                .setDescription('Riproduci un link')
+                .addStringOption(option => option.setName('input').setDescription('Il link da riprodurre').setRequired(true))),
     async execute(interaction) {
         if (interaction.member.voice === null 
             || interaction.member.voice === undefined 
