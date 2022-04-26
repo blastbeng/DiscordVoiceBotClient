@@ -77,7 +77,7 @@ module.exports = {
                                 inputType: StreamType.Arbitrary,
                             });
                             player.play(resource);     
-                            interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                 
+                            interaction.editReply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                 
                         });
                     })
                 }).catch(function(error) {

@@ -244,6 +244,39 @@ client.on("speech", (msg) => {
                             console.log(error);
                         }); 
                     }
+            } else if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot'))
+            && (msg.content.toLowerCase().includes('riproduci') || msg.content.toLowerCase().includes('play'))) {
+                var words = msg.content.toLowerCase().replace('riproduci','').replace('play','').replace('pezzente','').replace('scemo','').replace('bot','').trim();
+                if (words !== ''){
+                    var params = api+path_audio+'youtube/search?text='+encodeURIComponent(words);
+                    fetch(
+                        params,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': '*/*' }
+                        }
+                    ).then(res => {
+                            new Promise((resolve, reject) => {
+                                var file = Math.random().toString(36).slice(2)+".wav";
+                                //var file = "temp.wav";
+                                var outFile = path+"/"+file;
+                                const dest = fs.createWriteStream(outFile);
+                                res.body.pipe(dest);
+                                res.body.on('end', () => resolve());
+                                dest.on('error', reject);
+                    
+                                dest.on('finish', function(){       
+                                    connection.subscribe(player);                         
+                                    const resource = createAudioResource(outFile, {
+                                        inputType: StreamType.Arbitrary,
+                                    });
+                                    player.play(resource);         
+                                });
+                            })
+                        }).catch(function(error) {
+                            console.log(error);
+                        }); 
+                    }
             } else if (msg.content.toLowerCase().includes('stop') || msg.content.toLowerCase().includes('ferma')) {
                     player.stop();
             } 
