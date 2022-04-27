@@ -135,6 +135,15 @@ client.on('interactionCreate', async interaction => {
                 } else {
                     await interaction.reply({ content: 'Il pezzente non sta riproducendo nulla', ephemeral: true });
                 }
+        } else if(interaction.customId === 'leave'){
+            const connection = getVoiceConnection(interaction.member.voice.guild.id);
+            if (connection !== null
+                && connection !== undefined){
+                    connection.destroy();
+                    await interaction.reply({ content: 'Il pezzente è uscito dal canale', ephemeral: true });
+                } else {
+                    await interaction.reply({ content: 'Il pezzente non si trova in nessun canale', ephemeral: true });
+                }
         }
     } else if (interaction.isSelectMenu()) {
         if(interaction.customId === 'videoselect'){
