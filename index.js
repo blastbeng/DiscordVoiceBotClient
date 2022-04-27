@@ -1,7 +1,10 @@
 const {
     Client,
     Intents,
-    Collection
+    Collection,
+    MessageActionRow, 
+    MessageButton,
+    MessageEmbed
 } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus, StreamType  } = require('@discordjs/voice');
 const { addSpeechEvent } = require("discord-speech-recognition");
@@ -14,6 +17,7 @@ const {
 const fs = require('fs');
 const findRemoveSync = require('find-remove');
 const config = require("./config.json");
+const http = require("http");
 
 const client = new Client({ intents: new Intents(32767) });
 addSpeechEvent(client, { lang: "it-IT", profanityFilter: false });
@@ -26,7 +30,9 @@ const player = createAudioPlayer();
 const fetch = require('node-fetch');
 
 const api=config.API_URL;
+const hostname=config.API_HOSTNAME;
 const path_audio="/chatbot_audio/"
+const path_music="/chatbot_music/"
 const path_text="/chatbot_text/"
 
 setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
@@ -108,7 +114,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
 
 
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand() && !interaction.isButton()) return;
+    if (!interaction.isSelectMenu() && !interaction.isCommand() && !interaction.isButton()) return;
     if (interaction.isCommand()){        
         const command = client.commands.get(interaction.commandName);
         if (!command) return;
@@ -129,6 +135,127 @@ client.on('interactionCreate', async interaction => {
                 } else {
                     await interaction.reply({ content: 'Il pezzente non sta riproducendo nulla', ephemeral: true });
                 }
+        }
+    } else if (interaction.isSelectMenu()) {
+        if(interaction.customId === 'videoselect'){
+            if (interaction.member.voice === null 
+                || interaction.member.voice === undefined 
+                || interaction.member.voice.channelId === null 
+                || interaction.member.voice.channelId === undefined ){
+                    interaction.reply({ content: 'Devi prima entrare in un canale vocale', ephemeral: true });
+            } else {
+            
+                var connection = null;
+                const connection_old = getVoiceConnection(interaction.member.voice.guild.id);
+                if (connection_old !== null 
+                    && connection_old !== undefined
+                    && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
+                    connection_old.destroy();
+                    connection = joinVoiceChannel({
+                        channelId: interaction.member.voice.channelId,
+                        guildId: interaction.guildId,
+                        adapterCreator: interaction.guild.voiceAdapterCreator,
+                        selfDeaf: false,
+                        selfMute: false
+                    });
+                } else if (connection_old === null 
+                            || connection_old === undefined){
+                        connection = joinVoiceChannel({
+                            channelId: interaction.member.voice.channelId,
+                            guildId: interaction.guildId,
+                            adapterCreator: interaction.guild.voiceAdapterCreator,
+                            selfDeaf: false,
+                            selfMute: false
+                        });
+                } else {
+                    connection = connection_old;
+                }
+                if (connection !== null
+                    && connection !== undefined){
+                    var video = interaction.values[0];
+                    var params = api+path_music+'youtube/get?url='+encodeURIComponent(video);
+                    await interaction.deferUpdate();
+                    fetch(
+                        params,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': '*/*' }
+                        }
+                    ).then(res => {
+                        new Promise((resolve, reject) => {
+                            var file = Math.random().toString(36).slice(2)+".mp3";
+                            //var file = "temp.wav";
+                            var outFile = path+"/"+file;
+                            const dest = fs.createWriteStream(outFile);
+                            res.body.pipe(dest);
+                            res.body.on('end', () => resolve());
+                            dest.on('error', reject);
+
+                            dest.on('finish', function(){      
+                                connection.subscribe(player);                      
+                                const resource = createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                });
+                                player.play(resource); 
+                                const row = new MessageActionRow()
+                                .addComponents(
+                                    new MessageButton()
+                                        .setCustomId('stop')
+                                        .setLabel('Stop')
+                                        .setStyle('PRIMARY'),
+                                );
+                                const options = {
+                                    "method": "GET",
+                                    "hostname": hostname,
+                                    "port": 5080,
+                                    "path": path_music+'youtube/info?url='+encodeURIComponent(video)
+                                }
+                                const req = http.request(options, function(res) {
+            
+                                    var chunks = [];
+                                
+                                    res.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+                                
+                                    res.on("end", function() {
+                                        var body = Buffer.concat(chunks);
+                                        var object = JSON.parse(body.toString())
+                                        
+                                        const rowStop = new MessageActionRow()
+                                        .addComponents(
+                                            new MessageButton()
+                                                .setCustomId('stop')
+                                                .setLabel('Stop')
+                                                .setStyle('PRIMARY'),
+                                        );
+                                        if (object.length === 0) {                                
+                                            interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
+                                        } else {
+                                           var videores = object[0];
+                                           const embed = new MessageEmbed()
+                                                .setColor('#0099ff')
+                                                .setTitle(videores.title)
+                                                .setURL(videores.link)
+                                                .setDescription(videores.link);
+                                           
+                                           interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                        }
+                                    });
+                                
+                                });        
+                                
+                                req.end()  
+                            });
+                        })
+                    }).catch(function(error) {
+                        console.log(error);
+                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
+                    });
+                } else {                
+                    await interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                }
+            }
         }
     }
 });
@@ -178,9 +305,9 @@ client.on("speech", (msg) => {
             && msg.content !== undefined 
             && msg.content !== 'undefined') {
         
-            if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot'))
-                && !msg.content.toLowerCase().includes('cerca')) {
-                var words = msg.content.toLowerCase().replace('pezzente','').replace('scemo','').replace('bot','').trim();
+            if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot') || msg.content.toLowerCase().includes('boat'))
+                && !msg.content.toLowerCase().includes('cerca') && !msg.content.toLowerCase().includes('play') && !msg.content.toLowerCase().includes('riproduci')) {
+                var words = msg.content.toLowerCase().replace('pezzente','').replace('scemo','').replace('bot','').replace('boat','').trim();
                 if (words === ''){
                     words = 'ciao';
                 }
@@ -211,9 +338,9 @@ client.on("speech", (msg) => {
                 }).catch(function(error) {
                     console.log(error);
                 }); 
-            } else if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot'))
-                    && msg.content.toLowerCase().includes('cerca')) {
-                var words = msg.content.toLowerCase().replace('cerca','').replace('pezzente','').replace('scemo','').replace('bot','').trim();
+            } else if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot') || msg.content.toLowerCase().includes('boat'))
+                    && msg.content.toLowerCase().includes('cerca') && !msg.content.toLowerCase().includes('play') && !msg.content.toLowerCase().includes('riproduci')) {
+                var words = msg.content.toLowerCase().replace('cerca','').replace('pezzente','').replace('scemo','').replace('bot','').replace('boat','').trim();
                 if (words !== ''){
                     var params = api+path_audio+"search/"+words;
                     fetch(
@@ -244,39 +371,97 @@ client.on("speech", (msg) => {
                             console.log(error);
                         }); 
                     }
-            //} else if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot'))
-            //&& (msg.content.toLowerCase().includes('riproduci') || msg.content.toLowerCase().includes('play'))) {
-            //    var words = msg.content.toLowerCase().replace('riproduci','').replace('play','').replace('pezzente','').replace('scemo','').replace('bot','').trim();
-            //    if (words !== ''){
-            //        var params = api+path_audio+'youtube/search?text='+encodeURIComponent(words);
-            //        fetch(
-            //            params,
-            //            {
-            //                method: 'GET',
-            //                headers: { 'Accept': '*/*' }
-            //            }
-            //        ).then(res => {
-            //                new Promise((resolve, reject) => {
-            //                    var file = Math.random().toString(36).slice(2)+".wav";
-            //                    //var file = "temp.wav";
-            //                    var outFile = path+"/"+file;
-            //                    const dest = fs.createWriteStream(outFile);
-            //                    res.body.pipe(dest);
-            //                    res.body.on('end', () => resolve());
-            //                    dest.on('error', reject);
-            //        
-            //                    dest.on('finish', function(){       
-            //                        connection.subscribe(player);                         
-            //                        const resource = createAudioResource(outFile, {
-            //                            inputType: StreamType.Arbitrary,
-            //                        });
-            //                        player.play(resource);         
-            //                    });
-            //                })
-            //            }).catch(function(error) {
-            //                console.log(error);
-            //            }); 
-            //        }
+            } else if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot') || msg.content.toLowerCase().includes('boat'))
+            && !msg.content.toLowerCase().includes('cerca') && (msg.content.toLowerCase().includes('riproduci') || msg.content.toLowerCase().includes('play'))) {
+                var video = msg.content.toLowerCase().replace('riproduci','').replace('play','').replace('pezzente','').replace('scemo','').replace('bot','').replace('boat','').trim();
+                if (video !== ''){
+                    words = "Sto cercando: "+video;
+                    var params = api+path_audio+"repeat/"+words;
+                    
+                    fetch(
+                        params,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': '*/*' }
+                        }
+                    ).then(res => {
+                        new Promise((resolve, reject) => {
+                            var file = Math.random().toString(36).slice(2)+".wav";
+                            //var file = "temp.wav";
+                            var outFile = path+"/"+file;
+                            const dest = fs.createWriteStream(outFile);
+                            res.body.pipe(dest);
+                            res.body.on('end', () => resolve());
+                            dest.on('error', reject);
+
+                            dest.on('finish', function(){      
+                                connection.subscribe(player);                      
+                                const resource = createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                });
+                                player.play(resource);   
+                                player.on(AudioPlayerStatus.Idle, () => {   
+                                    const options = {
+                                        "method": "GET",
+                                        "hostname": hostname,
+                                        "port": 5080,
+                                        "path": path_music+'youtube/search?text='+encodeURIComponent(video)
+                                    }
+                                    const req = http.request(options, function(res) {
+                
+                                        var chunks = [];
+                                    
+                                        res.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+                                    
+                                        res.on("end", function() {
+                                            var body = Buffer.concat(chunks);
+                                            var object = JSON.parse(body.toString())
+                                            if (object.length !== 0) {
+                                                var videourl = object[0].link;
+                                                var params = api+path_music+'youtube/get?url='+encodeURIComponent(videourl);
+                                                fetch(
+                                                    params,
+                                                    {
+                                                        method: 'GET',
+                                                        headers: { 'Accept': '*/*' }
+                                                    }
+                                                ).then(res => {
+                                                    new Promise((resolve, reject) => {
+                                                        var file = Math.random().toString(36).slice(2)+".mp3";
+                                                        //var file = "temp.wav";
+                                                        var outFile = path+"/"+file;
+                                                        const dest = fs.createWriteStream(outFile);
+                                                        res.body.pipe(dest);
+                                                        res.body.on('end', () => resolve());
+                                                        dest.on('error', reject);
+                    
+                                                        dest.on('finish', function(){      
+                                                            connection.subscribe(player);                      
+                                                            const resource = createAudioResource(outFile, {
+                                                                inputType: StreamType.Arbitrary,
+                                                            });
+                                                            player.play(resource); 
+                                                        });
+                                                    })
+                                                }).catch(function(error) {
+                                                    console.log(error);
+                                                }); 
+                                            }
+                                        });
+                                    
+                                    });
+                                    
+                                    req.end();      
+                                });
+                            });
+                        })
+                    }).catch(function(error) {
+                        console.log(error);
+                    }); 
+                    
+                }
             } else if (msg.content.toLowerCase().includes('stop') || msg.content.toLowerCase().includes('ferma')) {
                     player.stop();
             } 

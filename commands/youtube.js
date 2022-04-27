@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const config = require("../config.json");
 const player = createAudioPlayer();
@@ -10,7 +10,7 @@ const http = require("http");
 const path = config.CACHE_DIR;
 const api=config.API_URL;
 const hostname=config.API_HOSTNAME;
-const path_audio="/chatbot_music/"
+const path_music="/chatbot_music/"
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,11 +20,10 @@ module.exports = {
             option.setName('input')
                 .setDescription('Hai un link o vuoi cercare qualcosa?')
                 .setRequired(true)
-                //.addChoice('ricerca','ricerca')
+                .addChoice('ricerca','ricerca')
                 .addChoice('link','link')
                 )
-            //.addStringOption(option => option.setName('video').setDescription('link o ricerca').setRequired(true)
-            .addStringOption(option => option.setName('video').setDescription('link').setRequired(true)),
+            .addStringOption(option => option.setName('video').setDescription('link o ricerca').setRequired(true)),
     async execute(interaction) {
         if (interaction.member.voice === null 
             || interaction.member.voice === undefined 
@@ -57,7 +56,6 @@ module.exports = {
             } else {
                 connection = connection_old;
             }
-            interaction.deferReply({ ephemeral: true});
 
             const input = interaction.options.getString('input');            
             const video = interaction.options.getString('video');
@@ -65,11 +63,10 @@ module.exports = {
             if( input === 'link' ) {
 
                 if ( !video.startsWith('http')) {                    
-                    interaction.editReply({ content: 'Devi inserire un url di youtube se vuoi riprodurre da un link', ephemeral: true });   
+                    interaction.reply({ content: 'Devi inserire un url di youtube se vuoi riprodurre da un link', ephemeral: true });   
                 } else {
-
-                    var params = api+path_audio+'youtube/get?url='+encodeURIComponent(video);
-
+                    interaction.deferReply({ ephemeral: false });
+                    var params = api+path_music+'youtube/get?url='+encodeURIComponent(video);
                     fetch(
                         params,
                         {
@@ -92,14 +89,48 @@ module.exports = {
                                     inputType: StreamType.Arbitrary,
                                 });
                                 player.play(resource); 
-                                const row = new MessageActionRow()
-                                .addComponents(
-                                    new MessageButton()
-                                        .setCustomId('stop')
-                                        .setLabel('Stop')
-                                        .setStyle('PRIMARY'),
-                                );
-                                interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: true, components: [row] });           
+                                const options = {
+                                    "method": "GET",
+                                    "hostname": hostname,
+                                    "port": 5080,
+                                    "path": path_music+'youtube/info?url='+encodeURIComponent(video)
+                                }
+                                const req = http.request(options, function(res) {
+            
+                                    var chunks = [];
+                                
+                                    res.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+                                
+                                    res.on("end", function() {
+                                        var body = Buffer.concat(chunks);
+                                        var object = JSON.parse(body.toString())
+                                        
+                                        const rowStop = new MessageActionRow()
+                                        .addComponents(
+                                            new MessageButton()
+                                                .setCustomId('stop')
+                                                .setLabel('Stop')
+                                                .setStyle('PRIMARY'),
+                                        );
+                                        if (object.length === 0) {                                
+                                            interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
+                                        } else {
+                                           var video = object[0];
+                                           const embed = new MessageEmbed()
+                                                .setColor('#0099ff')
+                                                .setTitle(video.title)
+                                                .setURL(video.link)
+                                                .setDescription(video.link);
+                                           
+                                           interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                        }
+                                    });
+                                
+                                });         
+                                
+                                req.end()
                             });
                         })
                     }).catch(function(error) {
@@ -109,14 +140,14 @@ module.exports = {
             } else if( input === 'ricerca' ) {
 
                 if ( video.startsWith('http')) {                    
-                    interaction.editReply({ content: 'Devi selezionare "link" se vuoi riprodurre un url di youtube', ephemeral: true });   
+                    interaction.reply({ content: 'Devi selezionare "link" se vuoi riprodurre un url di youtube', ephemeral: true });   
                 } else {
-
+                    interaction.deferReply({ ephemeral: false });
                     const options = {
                         "method": "GET",
                         "hostname": hostname,
                         "port": 5080,
-                        "path": path_audio+'youtube/search?text='+encodeURIComponent(video)
+                        "path": path_music+'youtube/search?text='+encodeURIComponent(video)
                     }
                     const req = http.request(options, function(res) {
 
@@ -128,13 +159,34 @@ module.exports = {
                     
                         res.on("end", function() {
                             var body = Buffer.concat(chunks);
-                            console.log(body.toString());
-                            interaction.editReply({ content: 'test test', ephemeral: true });     
+                            var object = JSON.parse(body.toString())
+                            if (object.length === 0) {                                
+                                interaction.editReply({ content: 'Non ho trovato risultati per "'+video+'"', ephemeral: false});  
+                            } else {
+                                var options = [];
+                                for (var i = 0; i < object.length && i < 25; i++) {
+                                    var videores = object[i];
+                                    var option = {};
+                                    option.label = videores.title;
+                                    option.description = videores.link;
+                                    option.value = videores.link
+                                    options.push(option);
+                                }
+                                
+                                const row = new MessageActionRow()
+                                .addComponents(
+                                    new MessageSelectMenu()
+                                        .setCustomId('videoselect')
+                                        .setPlaceholder('Seleziona un video da riprodurre')
+                                        .addOptions(options),
+                                )
+                                interaction.editReply({ content: 'Qualcuno ha cercato "' + video + '" Seleziona un link da riprodurre',  ephemeral: false, components: [row] });     
+                            }
                         });
                     
                     });
                     
-                    req.end()
+                    req.end();
                 }
             }
         }
