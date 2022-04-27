@@ -135,6 +135,7 @@ module.exports = {
                         })
                     }).catch(function(error) {
                         console.log(error);
+                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
                     }); 
                 }
             } else if( input === 'ricerca' ) {

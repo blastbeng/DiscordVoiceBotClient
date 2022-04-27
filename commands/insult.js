@@ -50,9 +50,14 @@ module.exports = {
             }
             interaction.deferReply({ ephemeral: true});
 
-            const words = interaction.options.getString('input');
+            var words = interaction.options.getString('input');
+            var params = "";
+            if (words === null || words === undefined){
+                params = api+path_audio+"insult?text=none";
+            } else {
+                params = api+path_audio+"insult?text="+encodeURIComponent(words);
+            }
 
-            var params = api+path_audio+"insult?text="+encodeURIComponent(words);
 
             fetch(
                 params,
@@ -76,11 +81,12 @@ module.exports = {
                             inputType: StreamType.Arbitrary,
                         });
                         player.play(resource);      
-                        interaction.editReply({ content: 'Il pezzente sta parlando', ephemeral: true });          
+                        interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                     });
                 })
             }).catch(function(error) {
                 console.log(error);
+                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
             }); 
         }
 

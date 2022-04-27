@@ -82,6 +82,7 @@ module.exports = {
                     })
                 }).catch(function(error) {
                     console.log(error);
+                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
                 });
             } else {
                 interaction.editReply({ content: 'Ma che c**** scrivi?!', ephemeral: true });
