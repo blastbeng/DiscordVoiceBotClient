@@ -1,80 +1,60 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
 
-
 const fs = require('fs');
 const config = require("../config.json");
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
 const http = require("http");
 
-
 const path = config.CACHE_DIR;
 const hostname=config.API_HOSTNAME;
 const api=config.API_URL;
 const path_audio="/chatbot_audio/"
 const path_text="/chatbot_text/"
-
-
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('insult')
-        .setDescription('Il pezzente insulta qualcuno')        
+        .setName('wikipedia')
+        .setDescription('Il pezzente cerca qualcosa su wikipedia')        
         .addStringOption(option =>
             option.setName('type')
                 .setDescription('Vuoi riprodurre via TTS o mostrare in Chat?')
                 .setRequired(true)
                 .addChoice('TTS', 'TTS')
                 .addChoice('Chat', 'Chat'))
-        .addUserOption(option => option.setName('user')
-        	.setDescription('Chi vuoi insultare? (Puoi lasciare vuoto)')
-		.setRequired(true)),
-    async execute(interaction) {
+        .addStringOption(option => option.setName('input').setDescription('Che cosa vuoi cercare?').setRequired(true)),
+    async execute(interaction) {     
 
-        
-        const user = interaction.options.getUser('user');
-        var words = null;
-        if (user !== null && user !== undefined){
-            words = interaction.options.getUser('user').username;
-        }
+        const words = interaction.options.getString('input');
         const type = interaction.options.getString('type');
-
         if (type === 'Chat') {
+                const options = {
+                    "method": "GET",
+                    "hostname": hostname,
+                    "port": 5080,
+                    "path": path_text+'search/'+encodeURIComponent(words)
+                }
 
-            var params = "";
-            if (words === null || words === undefined){
-                params = path_text+"insult?text=none";
-            } else {
-                params = path_text+"insult?text="+encodeURIComponent(words);
-            }
-
-            const options = {
-                "method": "GET",
-                "hostname": hostname,
-                "port": 5080,
-                "path": params
-            }
-
-            const req = http.request(options, function(res) {
-        
-                var chunks = [];     
+                const req = http.request(options, function(res) {
             
-                res.on("data", function (chunk) {
-                    chunks.push(chunk);
-                });
-            
-                res.on("end", function() {
-                    var body = Buffer.concat(chunks);
-                    var msgsearch = body.toString();
-                    
-                    interaction.reply({ content: msgsearch, ephemeral: false });  
-                    
-                });
-            
-            });         
-            
-            req.end()
-        } else if (type === 'TTS') { 
+                    var chunks = [];     
+                
+                    res.on("data", function (chunk) {
+                        chunks.push(chunk);
+                    });
+                
+                    res.on("end", function() {
+                        var body = Buffer.concat(chunks);
+                        var msgsearch = body.toString();
+                        
+                        interaction.reply({ content: msgsearch, ephemeral: true });  
+                        
+                    });
+                
+                });         
+                
+                req.end()
+        } else if (type === 'TTS') {         
 
             if (interaction.member.voice === null 
                 || interaction.member.voice === undefined 
@@ -109,16 +89,7 @@ module.exports = {
                 }
                 interaction.deferReply({ ephemeral: true});
 
-
-                var params = "";
-                if (words === null || words === undefined){
-                    params = api+path_audio+"insult?text=none";
-                } else {
-                    params = api+path_audio+"insult?text="+encodeURIComponent(words);
-                }
-
-
-
+                var params = api+path_audio+"search/"+words;
 
                 fetch(
                     params,
@@ -136,14 +107,13 @@ module.exports = {
                         res.body.on('end', () => resolve());
                         dest.on('error', reject);
 
-
-                        dest.on('finish', function(){      
-                            connection.subscribe(player);                      
+                        dest.on('finish', function(){       
+                            connection.subscribe(player);                     
                             const resource = createAudioResource(outFile, {
                                 inputType: StreamType.Arbitrary,
                             });
-                            player.play(resource);      
-                            interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
+                            player.play(resource);    
+                            interaction.editReply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                             
                         });
                     })
                 }).catch(function(error) {
