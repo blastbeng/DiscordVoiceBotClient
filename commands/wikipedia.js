@@ -47,7 +47,7 @@ module.exports = {
                         var body = Buffer.concat(chunks);
                         var msgsearch = body.toString();
                         
-                        interaction.reply({ content: msgsearch, ephemeral: true });  
+                        interaction.reply({ content: msgsearch, ephemeral: false });  
                         
                     });
                 
