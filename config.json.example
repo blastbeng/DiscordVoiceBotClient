@@ -1,7 +1,9 @@
 {
-    "BOT_TOKEN" : "YOURBOTTOKEN",
-    "BOT_ID" : "YOURBOTID",
-    "GUILD_ID" : "YOURGUILDID",
-    "API_URL"   : "http://localhost:5080",
+    "BOT_TOKEN" : "BOT_TOKEN",
+    "BOT_ID" : "BOT_ID",
+    "GUILD_ID" : "GUILD_ID",
+    "API_URL"   : "http://YOURIP:5080",
+    "API_HOSTNAME"   : "YOURIP",
+    "API_PORT"   : 5080,
     "CACHE_DIR" : "/tmp/DiscordVoiceBot/audio"
 }

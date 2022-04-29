@@ -9,6 +9,7 @@ const http = require("http");
 
 const path = config.CACHE_DIR;
 const api=config.API_URL;
+const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
 const path_music="/chatbot_music/"
 
@@ -92,11 +93,15 @@ module.exports = {
                                 const options = {
                                     "method": "GET",
                                     "hostname": hostname,
-                                    "port": 5080,
+                                    "port": port,
                                     "path": path_music+'youtube/info?url='+encodeURIComponent(video)
                                 }
                                 const req = http.request(options, function(res) {
-            
+                                    
+                                    req.on('error', function (error) {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                    });
                                     var chunks = [];
                                 
                                     res.on("data", function (chunk) {
@@ -147,11 +152,15 @@ module.exports = {
                     const options = {
                         "method": "GET",
                         "hostname": hostname,
-                        "port": 5080,
+                        "port": port,
                         "path": path_music+'youtube/search?text='+encodeURIComponent(video)
                     }
                     const req = http.request(options, function(res) {
-
+                        
+                        req.on('error', function (error) {
+                            console.log(error);
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                        });
                         var chunks = [];
                     
                         res.on("data", function (chunk) {

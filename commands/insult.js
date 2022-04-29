@@ -12,6 +12,7 @@ const http = require("http");
 const path = config.CACHE_DIR;
 const hostname=config.API_HOSTNAME;
 const api=config.API_URL;
+const port=config.API_PORT;
 const path_audio="/chatbot_audio/"
 const path_text="/chatbot_text/"
 
@@ -51,12 +52,16 @@ module.exports = {
             const options = {
                 "method": "GET",
                 "hostname": hostname,
-                "port": 5080,
+                "port": port,
                 "path": params
             }
 
             const req = http.request(options, function(res) {
-        
+                
+                req.on('error', function (error) {
+                    console.log(error);
+                    interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                });
                 var chunks = [];     
             
                 res.on("data", function (chunk) {

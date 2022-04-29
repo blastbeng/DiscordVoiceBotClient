@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
 const http = require("http");
 
 const path = config.CACHE_DIR;
+const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
 const api=config.API_URL;
 const path_audio="/chatbot_audio/"
@@ -31,12 +32,16 @@ module.exports = {
                 const options = {
                     "method": "GET",
                     "hostname": hostname,
-                    "port": 5080,
+                    "port": port,
                     "path": path_text+'search/'+encodeURIComponent(words)
                 }
 
                 const req = http.request(options, function(res) {
-            
+                    
+                    req.on('error', function (error) {
+                        console.log(error);
+                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                    });
                     var chunks = [];     
                 
                     res.on("data", function (chunk) {

@@ -30,6 +30,7 @@ const player = createAudioPlayer();
 const fetch = require('node-fetch');
 
 const api=config.API_URL;
+const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
 const path_audio="/chatbot_audio/"
 const path_music="/chatbot_music/"
@@ -126,7 +127,9 @@ client.on('interactionCreate', async interaction => {
                 await interaction.reply({ content: 'Errore!', ephemeral: true });
             }
         } else if (interaction.isButton()){
-            if(interaction.customId === 'stop'){
+            if(interaction.customId === 'tournament_add'){
+
+            } else if(interaction.customId === 'stop'){
                 const connection = getVoiceConnection(interaction.member.voice.guild.id);
                 if (connection !== null
                     && connection !== undefined){
@@ -216,9 +219,7 @@ client.on('interactionCreate', async interaction => {
                 }
             }
         } else if (interaction.isSelectMenu()) {
-            if(interaction.customId === 'users_tournament') {                
-                interaction.reply({ content: 'Il generatore di tornei ancora non funziona, quello stronzo di blast deve implementarmi', ephemeral: false });
-            } else if(interaction.customId === 'videoselect'){
+            if(interaction.customId === 'videoselect'){
                 if (interaction.member.voice === null 
                     || interaction.member.voice === undefined 
                     || interaction.member.voice.channelId === null 
@@ -288,13 +289,17 @@ client.on('interactionCreate', async interaction => {
                                     const options = {
                                         "method": "GET",
                                         "hostname": hostname,
-                                        "port": 5080,
+                                        "port": port,
                                         "path": path_music+'youtube/info?url='+encodeURIComponent(video)
                                     }
                                     const req = http.request(options, function(res) {
                 
                                         var chunks = [];
                                     
+                                        req.on('error', function (error) {
+                                            console.log(error);
+                                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                        });
                                         res.on("data", function (chunk) {
                                             chunks.push(chunk);
                                         });
@@ -489,11 +494,15 @@ client.on("speech", (msg) => {
                                     const options = {
                                         "method": "GET",
                                         "hostname": hostname,
-                                        "port": 5080,
+                                        "port": port,
                                         "path": path_music+'youtube/search?text='+encodeURIComponent(video)
                                     }
                                     const req = http.request(options, function(res) {
-                
+                                        
+                                        req.on('error', function (error) {
+                                            console.log(error);
+                                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                        });
                                         var chunks = [];
                                     
                                         res.on("data", function (chunk) {
