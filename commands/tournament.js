@@ -189,7 +189,7 @@ module.exports = {
                     if (object.teamsize > 1) {
                         embed = new MessageEmbed()
                         .setColor('#0099ff')
-                        .setTitle(name)
+                        .setTitle(object.name)
                         .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                         .setDescription(object.description)
                         .setThumbnail(object.image)
@@ -208,7 +208,7 @@ module.exports = {
                     } else {
                         embed = new MessageEmbed()
                         .setColor('#0099ff')
-                        .setTitle(name)
+                        .setTitle(object.name)
                         .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                         .setDescription(object.description)
                         .setThumbnail(object.image)
