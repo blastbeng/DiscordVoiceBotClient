@@ -11,7 +11,7 @@ const path_text="/chatbot_text/"
 function getSlashCommand() {
     var command = new SlashCommandBuilder()
     .setName('tournament')
-    .setDescription('Genera un torneo inserendo manualmente i parametri (Min 3 - Max 16 Partecipanti)')
+    .setDescription('Genera un torneo (Max 16 Utenti)')
     .addStringOption(option => option.setName('name').setDescription('Nome del torneo').setRequired(true))
     .addIntegerOption(option => option.setName('size').setDescription('Dimensione dei Team').setRequired(true))
     .addStringOption(option => option.setName('description').setDescription('Descrizione del torneo').setRequired(true))
