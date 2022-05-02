@@ -8,26 +8,11 @@ const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
 const path_text="/chatbot_text/"
 
-function getSlashCommand() {
-    var command = new SlashCommandBuilder()
-    .setName('tournament')
-    .setDescription('Genera un torneo inserendo manualmente i parametri (Min 3 - Max 16 Partecipanti)')
-    .addStringOption(option => option.setName('name').setDescription('Nome del torneo').setRequired(true))
-    .addIntegerOption(option => option.setName('size').setDescription('Dimensione dei Team').setRequired(true))
-    .addStringOption(option => option.setName('description').setDescription('Descrizione del torneo').setRequired(true))
-    .addStringOption(option => option.setName('image').setDescription("Link Immagine del torneo").setRequired(true));
-    for(var i = 1; i < 17; i++){
-        if ( i <= 3 ) {
-            command.addUserOption(option => option.setName('user'+i).setDescription('Partecipante '+i).setRequired(true));
-        } else {            
-            command.addUserOption(option => option.setName('user'+i).setDescription('Partecipante '+i).setRequired(false));
-        }
-    }
-    return command;
-}
-
 module.exports = {
-    data: getSlashCommand(),
+    data: new SlashCommandBuilder()
+        .setName('quicktournament')
+        .setDescription('Genera un torneo usando gli utenti connessi in chat (Min 3 - Max 16 Partecipanti)')
+        .addIntegerOption(option => option.setName('size').setDescription('Dimensione dei Team').setRequired(true)),
     async execute(interaction) {
         var errorMsg = "";
         
@@ -38,52 +23,17 @@ module.exports = {
             interaction.reply({ content: errorMsg, ephemeral: true });  
             return
         }
-        
 
-        const name = interaction.options.getString('name');  
-        var description = interaction.options.getString('description');    
-        var image = interaction.options.getString('image');
-
-        if (!image.startsWith('http')){            
-            var errorMsg = "Errore! Il link dell'immagine non è corretto.";
-            interaction.reply({ content: errorMsg, ephemeral: true });  
-            return
-        }
-        
-        var arrayUsers = [];
-        for(var i = 1; i < 17; i++){
-            var user = interaction.options.getUser('user'+i);   
-            if (user !== null && user !== undefined) {
-                if (user.bot) {        
-                    var errorMsg = "Errore! Hai inserito un bot come partecipante del torneo.";
-                    interaction.reply({ content: errorMsg, ephemeral: true });  
-                    return
-                }
-                for(var j = 0; j< arrayUsers.length; j++){
-                    var partecipante = arrayUsers[j];
-                    if (partecipante.id === user.id){
-                        var errorMsg = "Errore! Hai inserito due volte lo stesso partecipante.";
-                        interaction.reply({ content: errorMsg, ephemeral: true });  
-                        return;
-                    }
-                }
-                var user_add = {
-                    'id': user.id,
-                    'username': user.username,
-                    'image': user.displayAvatarURL()
-                }
-                arrayUsers.push(user_add);
-            }
-        }
+        var arrayUsers = []
 
         var tournamentData = { 
             'author' : interaction.member.user.username, 
             'author_image' : interaction.member.user.displayAvatarURL(), 
             'guild_image' : interaction.member.guild.iconURL(), 
             'teamsize' : teamsize,
-            'name' : 'TORNEO: ' + name, 
-            'description' : description, 
-            'image' : image, 
+            'name' : 'TORNEO: Luridi Pezzenti n° ' + Math.floor(Math.random() * 9999), 
+            'description' : 'torneo generato automaticamente', 
+            'image' : interaction.member.guild.iconURL(), 
             'users' : arrayUsers
         };
 
@@ -189,7 +139,7 @@ module.exports = {
                     if (object.teamsize > 1) {
                         embed = new MessageEmbed()
                         .setColor('#0099ff')
-                        .setTitle(name)
+                        .setTitle(object.name)
                         .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                         .setDescription(object.description)
                         .setThumbnail(object.image)
@@ -208,7 +158,7 @@ module.exports = {
                     } else {
                         embed = new MessageEmbed()
                         .setColor('#0099ff')
-                        .setTitle(name)
+                        .setTitle(object.name)
                         .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                         .setDescription(object.description)
                         .setThumbnail(object.image)

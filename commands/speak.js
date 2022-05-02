@@ -29,25 +29,17 @@ module.exports = {
                 && connection_old !== undefined
                 && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
                 connection_old.destroy();
-                connection = joinVoiceChannel({
-                    channelId: interaction.member.voice.channelId,
-                    guildId: interaction.guildId,
-                    adapterCreator: interaction.guild.voiceAdapterCreator,
-                    selfDeaf: false,
-                    selfMute: false
-                });
-            } else if (connection_old === null 
-                        || connection_old === undefined){
-                    connection = joinVoiceChannel({
-                        channelId: interaction.member.voice.channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.guild.voiceAdapterCreator,
-                        selfDeaf: false,
-                        selfMute: false
-                    });
             } else {
                 connection = connection_old;
             }
+            
+            connection = joinVoiceChannel({
+                channelId: interaction.member.voice.channelId,
+                guildId: interaction.guildId,
+                adapterCreator: interaction.guild.voiceAdapterCreator,
+                selfDeaf: false,
+                selfMute: false
+            });
             interaction.deferReply({ ephemeral: true});
 
             const words = interaction.options.getString('input');

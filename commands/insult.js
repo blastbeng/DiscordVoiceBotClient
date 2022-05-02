@@ -69,10 +69,17 @@ module.exports = {
                 });
             
                 res.on("end", function() {
-                    var body = Buffer.concat(chunks);
-                    var msgsearch = body.toString();
+                        try {
+                        var body = Buffer.concat(chunks);
+                        var msgsearch = body.toString();
+                        
+                        interaction.reply({ content: msgsearch, ephemeral: false });  
                     
-                    interaction.reply({ content: msgsearch, ephemeral: false });  
+                                            
+                    } catch (error) {
+                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                        console.error(error);
+                    }
                     
                 });
             
@@ -92,7 +99,11 @@ module.exports = {
                 if (connection_old !== null 
                     && connection_old !== undefined
                     && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
-                    connection_old.destroy();
+                        connection_old.destroy();
+                    } else {
+                        connection = connection_old;
+                    }
+                    
                     connection = joinVoiceChannel({
                         channelId: interaction.member.voice.channelId,
                         guildId: interaction.guildId,
@@ -100,18 +111,6 @@ module.exports = {
                         selfDeaf: false,
                         selfMute: false
                     });
-                } else if (connection_old === null 
-                            || connection_old === undefined){
-                        connection = joinVoiceChannel({
-                            channelId: interaction.member.voice.channelId,
-                            guildId: interaction.guildId,
-                            adapterCreator: interaction.guild.voiceAdapterCreator,
-                            selfDeaf: false,
-                            selfMute: false
-                        });
-                } else {
-                    connection = connection_old;
-                }
                 interaction.deferReply({ ephemeral: true});
 
 

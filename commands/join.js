@@ -28,28 +28,19 @@ module.exports = {
                     && connection_old !== undefined
                     && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
                     connection_old.destroy();
-                    connection = joinVoiceChannel({
-                        channelId: interaction.member.voice.channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.guild.voiceAdapterCreator,
-                        selfDeaf: false,
-                        selfMute: false
-                    });
                     interaction.reply({ content: 'Il pezzente è entrato nel canale', ephemeral: true });
-                } else if (connection_old === null 
-                            || connection_old === undefined){
-                        connection = joinVoiceChannel({
-                            channelId: interaction.member.voice.channelId,
-                            guildId: interaction.guildId,
-                            adapterCreator: interaction.guild.voiceAdapterCreator,
-                            selfDeaf: false,
-                            selfMute: false
-                        });
-                    interaction.reply({ content: 'Il pezzente è già nel canale', ephemeral: true });
                 } else {
                     connection = connection_old;
-                    interaction.reply({ content: 'Il pezzente è già nel canale', ephemeral: true });
+                    interaction.reply({ content: 'Il pezzente è entrato nel canale', ephemeral: true });
                 }
+                
+                connection = joinVoiceChannel({
+                    channelId: interaction.member.voice.channelId,
+                    guildId: interaction.guildId,
+                    adapterCreator: interaction.guild.voiceAdapterCreator,
+                    selfDeaf: false,
+                    selfMute: false
+                });
             } catch (error) {
                 console.error(error);
             }

@@ -38,25 +38,17 @@ module.exports = {
                 && connection_old !== undefined
                 && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
                 connection_old.destroy();
-                connection = joinVoiceChannel({
-                    channelId: interaction.member.voice.channelId,
-                    guildId: interaction.guildId,
-                    adapterCreator: interaction.guild.voiceAdapterCreator,
-                    selfDeaf: false,
-                    selfMute: false
-                });
-            } else if (connection_old === null 
-                        || connection_old === undefined){
-                    connection = joinVoiceChannel({
-                        channelId: interaction.member.voice.channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.guild.voiceAdapterCreator,
-                        selfDeaf: false,
-                        selfMute: false
-                    });
             } else {
                 connection = connection_old;
             }
+            
+            connection = joinVoiceChannel({
+                channelId: interaction.member.voice.channelId,
+                guildId: interaction.guildId,
+                adapterCreator: interaction.guild.voiceAdapterCreator,
+                selfDeaf: false,
+                selfMute: false
+            });
 
             const input = interaction.options.getString('input');            
             const video = interaction.options.getString('video');
@@ -66,7 +58,6 @@ module.exports = {
                 if ( !video.startsWith('http')) {                    
                     interaction.reply({ content: 'Devi inserire un url di youtube se vuoi riprodurre da un link', ephemeral: true });   
                 } else {
-                    interaction.deferReply({ ephemeral: false });
                     var params = api+path_music+'youtube/get?url='+encodeURIComponent(video);
                     fetch(
                         params,
@@ -100,7 +91,7 @@ module.exports = {
                                     
                                     req.on('error', function (error) {
                                         console.log(error);
-                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                                     });
                                     var chunks = [];
                                 
@@ -109,27 +100,33 @@ module.exports = {
                                     });
                                 
                                     res.on("end", function() {
-                                        var body = Buffer.concat(chunks);
-                                        var object = JSON.parse(body.toString())
-                                        
-                                        const rowStop = new MessageActionRow()
-                                        .addComponents(
-                                            new MessageButton()
-                                                .setCustomId('stop')
-                                                .setLabel('Stop')
-                                                .setStyle('PRIMARY'),
-                                        );
-                                        if (object.length === 0) {                                
-                                            interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
-                                        } else {
-                                           var video = object[0];
-                                           const embed = new MessageEmbed()
-                                                .setColor('#0099ff')
-                                                .setTitle(video.title)
-                                                .setURL(video.link)
-                                                .setDescription(video.link);
-                                           
-                                           interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                        try{
+                                            var body = Buffer.concat(chunks);
+                                            var object = JSON.parse(body.toString())
+                                            
+                                            const rowStop = new MessageActionRow()
+                                            .addComponents(
+                                                new MessageButton()
+                                                    .setCustomId('stop')
+                                                    .setLabel('Stop')
+                                                    .setStyle('PRIMARY'),
+                                            );
+                                            if (object.length === 0) {                                
+                                                interaction.reply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
+                                            } else {
+                                            var video = object[0];
+                                            const embed = new MessageEmbed()
+                                                    .setColor('#0099ff')
+                                                    .setTitle(video.title)
+                                                    .setURL(video.link)
+                                                    .setDescription(video.link);
+                                            
+                                            interaction.reply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                            }
+                                         
+                                        } catch (error) {
+                                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                                            console.error(error);
                                         }
                                     });
                                 
@@ -148,7 +145,7 @@ module.exports = {
                 if ( video.startsWith('http')) {                    
                     interaction.reply({ content: 'Devi selezionare "link" se vuoi riprodurre un url di youtube', ephemeral: true });   
                 } else {
-                    interaction.deferReply({ ephemeral: false });
+                    interaction.deferReply({ ephemeral: true });
                     const options = {
                         "method": "GET",
                         "hostname": hostname,
@@ -159,7 +156,7 @@ module.exports = {
                         
                         req.on('error', function (error) {
                             console.log(error);
-                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                         });
                         var chunks = [];
                     
@@ -168,29 +165,36 @@ module.exports = {
                         });
                     
                         res.on("end", function() {
-                            var body = Buffer.concat(chunks);
-                            var object = JSON.parse(body.toString())
-                            if (object.length === 0) {                                
-                                interaction.editReply({ content: 'Non ho trovato risultati per "'+video+'"', ephemeral: false});  
-                            } else {
-                                var options = [];
-                                for (var i = 0; i < object.length && i < 25; i++) {
-                                    var videores = object[i];
-                                    var option = {};
-                                    option.label = videores.title;
-                                    option.description = videores.link;
-                                    option.value = videores.link
-                                    options.push(option);
+
+                            try{
+                                var body = Buffer.concat(chunks);
+                                var object = JSON.parse(body.toString())
+                                if (object.length === 0) {                                
+                                    interaction.editReply({ content: 'Non ho trovato risultati per "'+video+'"', ephemeral: true});  
+                                } else {
+                                    var options = [];
+                                    for (var i = 0; i < object.length && i < 25; i++) {
+                                        var videores = object[i];
+                                        var option = {};
+                                        option.label = videores.title;
+                                        option.description = videores.link;
+                                        option.value = videores.link
+                                        options.push(option);
+                                    }
+                                    
+                                    const row = new MessageActionRow()
+                                    .addComponents(
+                                        new MessageSelectMenu()
+                                            .setCustomId('videoselect')
+                                            .setPlaceholder('Seleziona un video da riprodurre')
+                                            .addOptions(options),
+                                    )
+                                    interaction.editReply({ content: 'Qualcuno ha cercato "' + video + '" Seleziona un link da riprodurre',  ephemeral: true, components: [row] });     
                                 }
-                                
-                                const row = new MessageActionRow()
-                                .addComponents(
-                                    new MessageSelectMenu()
-                                        .setCustomId('videoselect')
-                                        .setPlaceholder('Seleziona un video da riprodurre')
-                                        .addOptions(options),
-                                )
-                                interaction.editReply({ content: 'Qualcuno ha cercato "' + video + '" Seleziona un link da riprodurre',  ephemeral: false, components: [row] });     
+                             
+                            } catch (error) {
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
+                                console.error(error);
                             }
                         });
                     

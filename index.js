@@ -127,8 +127,198 @@ client.on('interactionCreate', async interaction => {
                 await interaction.reply({ content: 'Errore!', ephemeral: true });
             }
         } else if (interaction.isButton()){
-            if(interaction.customId === 'tournament_add'){
+            if(interaction.customId === 'tournament_regen'){
+                var tournamentData = { 
+                    'author' : interaction.message.embeds[0].author.name, 
+                    'name' : interaction.message.embeds[0].title, 
+                    'description' : interaction.message.embeds[0].description
+                };
+                var bodyData = JSON.stringify(tournamentData)
+                const options = {
+                    "method": "POST",
+                    "hostname": hostname,
+                    "port": port,
+                    "path": path_text+'tournament',
+                    "headers": {
+                        'Content-Type': 'application/json',
+                        "Content-Length": Buffer.byteLength(bodyData)
+                    }
+                }
+                const req = http.request(options, function(res) {
+                    
+                    var chunks = [];
+                    res.setEncoding('utf8');
+                    req.on('error', function (error) {
+                        console.log(error);
+                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                    });
 
+                    res.on("data", function (chunk) {
+                        chunks.push(chunk);
+                    });
+                
+                    res.on("end", function() {
+                        try {
+                            var object = JSON.parse(chunks)           
+                            var fieldsUsers = [];              
+                            var fieldsTeams = [];           
+                            var fieldsRounds = []; 
+
+                            var i = 0;
+                            for (i = 0; i < object.users.length; i++) {
+                                var user = object.users[i];
+                                var fieldsUser = { name: user.username, value: user.title, inline: true }
+                                fieldsUsers.push(fieldsUser);     
+                            }
+                            
+                            if (i%3 !== 0){
+                                while(i%3 !== 0) {
+                                    var fieldsUser = { name: '\u200b', value: '\u200b', inline: true }
+                                    fieldsUsers.push(fieldsUser);     
+                                    i = i + 1;
+                                }
+                            }
+                            
+                            if (object.teamsize > 1) {
+                                for (i = 0; i < object.teams.length; i++) {
+                                    var team = object.teams[i];
+                                    var users_add = "";
+                                    for (var j = 0; j < team.users.length; j++) {
+                                        var user = team.users[j];
+                                        users_add = user.username + " " + users_add;                    
+                                    }                  
+                                    var teamName = "";   
+                                    if ( team.name === 0) {
+                                        teamName = team.users[0].title;
+                                    } else {
+                                        teamName = team.name;
+                                    }
+                                    var fieldsTeam = { name: teamName, value: users_add, inline: true }
+                                    fieldsTeams.push(fieldsTeam);
+                                }                    
+                                if (i%3 !== 0){
+                                    while(i%3 !== 0) {
+                                        var fieldsTeam = { name: '\u200b', value: '\u200b', inline: true }
+                                        fieldsTeams.push(fieldsUser);     
+                                        i = i + 1;
+                                    }
+                                }                            
+                            }
+
+                            for (i = 0; i < object.rounds.length; i++) {
+                                var round = object.rounds[i];
+                                var teams = "";
+                                teams = round.teams[0].name + "     VS     " + round.teams[1].name;
+
+                                var user0 = "";
+                                for (var j = 0; j < round.teams[0].users.length; j++) {
+                                    var user = round.teams[0].users[j];
+                                    user0 = user.username + " " + user0;                    
+                                }  
+                                var user1 = "";
+                                for (var j = 0; j < round.teams[1].users.length; j++) {
+                                    var user = round.teams[1].users[j];
+                                    user1 = user.username + " " + user1;                    
+                                }  
+
+                                var users = user0 + "     VS     " + user1;
+                                if (round.teams[0].name === 0 && round.teams[1].name === 0){
+                                    var fieldRound = { name: users, value: '\u200b', inline: false };
+                                    fieldsRounds.push(fieldRound);
+                                } else {                            
+                                    var fieldRound = { name: teams, value: users, inline: false };
+                                    fieldsRounds.push(fieldRound);
+                                }
+                            }
+                            var embed;
+                            if (object.teamsize > 1) {
+                                embed = new MessageEmbed()
+                                .setColor('#0099ff')
+                                .setTitle('TORNEO: ' + name)
+                                .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
+                                .setDescription(object.description)
+                                .setThumbnail(object.image)
+                                .addField('\u200b', '\u200b')
+                                .addField('PARTECIPANTI:', '\u200b', false)
+                                .addFields(fieldsUsers)
+                                .addField('\u200b', '\u200b')
+                                .addField('SQUADRE', '\u200b', false)
+                                .addFields(fieldsTeams)
+                                .addField('\u200b', '\u200b')
+                                .addField('MATCH GENERATI', '\u200b', false)
+                                .addFields(fieldsRounds)
+                                .setImage(object.image)
+                                .setTimestamp()
+                                .setFooter({ text: 'Creato da quel pezzente di '  + object.author, iconURL: object.guild_image });
+                            } else {
+                                embed = new MessageEmbed()
+                                .setColor('#0099ff')
+                                .setTitle('TORNEO: ' + name)
+                                .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
+                                .setDescription(object.description)
+                                .setThumbnail(object.image)
+                                .addField('\u200b', '\u200b')
+                                .addField('PARTECIPANTI:', '\u200b', false)
+                                .addFields(fieldsUsers)
+                                .addField('\u200b', '\u200b')
+                                .addField('MATCH GENERATI', '\u200b', false)
+                                .addFields(fieldsRounds)
+                                .setImage(object.image)
+                                .setTimestamp()
+                                .setFooter({ text: 'Creato da quel pezzente di '  + object.author, iconURL: object.guild_image });
+
+                            }
+                            const rowInfo1 = new MessageActionRow()
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('tournament_review1')
+                                    .setLabel("QUESTA E' UN ANTEPRIMA, SOLO TU PUOI VEDERLO!")
+                                    .setStyle('DANGER')
+                                    .setDisabled(true),
+                            );
+                            const rowInfo2 = new MessageActionRow()
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('tournament_review2')
+                                    .setLabel("PREMI 'PUBBLICA' PER PUBBLICARE IL TORNEO")
+                                    .setStyle('DANGER')
+                                    .setDisabled(true),
+                            );
+                            const rowInfo3 = new MessageActionRow()
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('tournament_review3')
+                                    .setLabel("OPPURE 'RIGENERA' PER RIGENERARE LE SQUADRE")
+                                    .setStyle('DANGER')
+                                    .setDisabled(true),
+                            );
+                            const row = new MessageActionRow()
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('tournament_regen')
+                                    .setLabel('Rigenera (Work in Progress)')
+                                    .setStyle('PRIMARY')
+                                    .setDisabled(true),
+                            )
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId('tournament_publish')
+                                    .setLabel('Pubblica')
+                                    .setStyle('PRIMARY'),
+                            )
+                            interaction.reply({ ephemeral: true, embeds: [ embed ], components: [rowInfo1,rowInfo2,rowInfo3,row] });   
+                        } catch (error) {
+                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                            console.error(error);
+                        }
+                    });
+                
+                });
+                
+                req.write(bodyData);
+                req.end();
+            } else if(interaction.customId === 'tournament_publish'){
+                await interaction.reply({ embeds: [ interaction.message.embeds[0] ], ephemeral: false });
             } else if(interaction.customId === 'stop'){
                 const connection = getVoiceConnection(interaction.member.voice.guild.id);
                 if (connection !== null
@@ -161,25 +351,17 @@ client.on('interactionCreate', async interaction => {
                         && connection_old !== undefined
                         && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
                         connection_old.destroy();
-                        connection = joinVoiceChannel({
-                            channelId: interaction.member.voice.channelId,
-                            guildId: interaction.guildId,
-                            adapterCreator: interaction.guild.voiceAdapterCreator,
-                            selfDeaf: false,
-                            selfMute: false
-                        });
-                    } else if (connection_old === null 
-                                || connection_old === undefined){
-                            connection = joinVoiceChannel({
-                                channelId: interaction.member.voice.channelId,
-                                guildId: interaction.guildId,
-                                adapterCreator: interaction.guild.voiceAdapterCreator,
-                                selfDeaf: false,
-                                selfMute: false
-                            });
                     } else {
                         connection = connection_old;
                     }
+                    
+                    connection = joinVoiceChannel({
+                        channelId: interaction.member.voice.channelId,
+                        guildId: interaction.guildId,
+                        adapterCreator: interaction.guild.voiceAdapterCreator,
+                        selfDeaf: false,
+                        selfMute: false
+                    });
                     interaction.deferReply({ ephemeral: true});
     
     
@@ -232,7 +414,11 @@ client.on('interactionCreate', async interaction => {
                     if (connection_old !== null 
                         && connection_old !== undefined
                         && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
-                        connection_old.destroy();
+                            connection_old.destroy();
+                        } else {
+                            connection = connection_old;
+                        }
+                        
                         connection = joinVoiceChannel({
                             channelId: interaction.member.voice.channelId,
                             guildId: interaction.guildId,
@@ -240,18 +426,6 @@ client.on('interactionCreate', async interaction => {
                             selfDeaf: false,
                             selfMute: false
                         });
-                    } else if (connection_old === null 
-                                || connection_old === undefined){
-                            connection = joinVoiceChannel({
-                                channelId: interaction.member.voice.channelId,
-                                guildId: interaction.guildId,
-                                adapterCreator: interaction.guild.voiceAdapterCreator,
-                                selfDeaf: false,
-                                selfMute: false
-                            });
-                    } else {
-                        connection = connection_old;
-                    }
                     if (connection !== null
                         && connection !== undefined){
                         var video = interaction.values[0];
@@ -305,27 +479,33 @@ client.on('interactionCreate', async interaction => {
                                         });
                                     
                                         res.on("end", function() {
-                                            var body = Buffer.concat(chunks);
-                                            var object = JSON.parse(body.toString())
+                                            try {
+                                                var body = Buffer.concat(chunks);
+                                                var object = JSON.parse(body.toString())
+                                                
+                                                const rowStop = new MessageActionRow()
+                                                .addComponents(
+                                                    new MessageButton()
+                                                        .setCustomId('stop')
+                                                        .setLabel('Stop')
+                                                        .setStyle('PRIMARY'),
+                                                );
+                                                if (object.length === 0) {                                
+                                                    interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
+                                                } else {
+                                                var videores = object[0];
+                                                const embed = new MessageEmbed()
+                                                        .setColor('#0099ff')
+                                                        .setTitle(videores.title)
+                                                        .setURL(videores.link)
+                                                        .setDescription(videores.link);
+                                                
+                                                interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                                }
                                             
-                                            const rowStop = new MessageActionRow()
-                                            .addComponents(
-                                                new MessageButton()
-                                                    .setCustomId('stop')
-                                                    .setLabel('Stop')
-                                                    .setStyle('PRIMARY'),
-                                            );
-                                            if (object.length === 0) {                                
-                                                interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
-                                            } else {
-                                            var videores = object[0];
-                                            const embed = new MessageEmbed()
-                                                    .setColor('#0099ff')
-                                                    .setTitle(videores.title)
-                                                    .setURL(videores.link)
-                                                    .setDescription(videores.link);
-                                            
-                                            interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                            } catch (error) {
+                                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
+                                                console.error(error);
                                             }
                                         });
                                     
@@ -510,38 +690,43 @@ client.on("speech", (msg) => {
                                         });
                                     
                                         res.on("end", function() {
-                                            var body = Buffer.concat(chunks);
-                                            var object = JSON.parse(body.toString())
-                                            if (object.length !== 0) {
-                                                var videourl = object[0].link;
-                                                var params = api+path_music+'youtube/get?url='+encodeURIComponent(videourl);
-                                                fetch(
-                                                    params,
-                                                    {
-                                                        method: 'GET',
-                                                        headers: { 'Accept': '*/*' }
-                                                    }
-                                                ).then(res => {
-                                                    new Promise((resolve, reject) => {
-                                                        var file = Math.random().toString(36).slice(2)+".mp3";
-                                                        //var file = "temp.wav";
-                                                        var outFile = path+"/"+file;
-                                                        const dest = fs.createWriteStream(outFile);
-                                                        res.body.pipe(dest);
-                                                        res.body.on('end', () => resolve());
-                                                        dest.on('error', reject);
-                    
-                                                        dest.on('finish', function(){      
-                                                            connection.subscribe(player);                      
-                                                            const resource = createAudioResource(outFile, {
-                                                                inputType: StreamType.Arbitrary,
+                                            try {
+                                                var body = Buffer.concat(chunks);
+                                                var object = JSON.parse(body.toString())
+                                                if (object.length !== 0) {
+                                                    var videourl = object[0].link;
+                                                    var params = api+path_music+'youtube/get?url='+encodeURIComponent(videourl);
+                                                    fetch(
+                                                        params,
+                                                        {
+                                                            method: 'GET',
+                                                            headers: { 'Accept': '*/*' }
+                                                        }
+                                                    ).then(res => {
+                                                        new Promise((resolve, reject) => {
+                                                            var file = Math.random().toString(36).slice(2)+".mp3";
+                                                            //var file = "temp.wav";
+                                                            var outFile = path+"/"+file;
+                                                            const dest = fs.createWriteStream(outFile);
+                                                            res.body.pipe(dest);
+                                                            res.body.on('end', () => resolve());
+                                                            dest.on('error', reject);
+                        
+                                                            dest.on('finish', function(){      
+                                                                connection.subscribe(player);                      
+                                                                const resource = createAudioResource(outFile, {
+                                                                    inputType: StreamType.Arbitrary,
+                                                                });
+                                                                player.play(resource); 
                                                             });
-                                                            player.play(resource); 
-                                                        });
-                                                    })
-                                                }).catch(function(error) {
-                                                    console.log(error);
-                                                }); 
+                                                        })
+                                                    }).catch(function(error) {
+                                                        console.log(error);
+                                                    }); 
+                                                }
+                                            
+                                            } catch (error) {
+                                                console.error(error);
                                             }
                                         });
                                     

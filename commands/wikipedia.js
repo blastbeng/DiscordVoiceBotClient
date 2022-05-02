@@ -49,10 +49,17 @@ module.exports = {
                     });
                 
                     res.on("end", function() {
-                        var body = Buffer.concat(chunks);
-                        var msgsearch = body.toString();
-                        
-                        interaction.reply({ content: msgsearch, ephemeral: false });  
+
+                        try {
+                            var body = Buffer.concat(chunks);
+                            var msgsearch = body.toString();
+                            
+                            interaction.reply({ content: msgsearch, ephemeral: false });  
+                             
+                        } catch (error) {
+                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                            console.error(error);
+                        }
                         
                     });
                 
@@ -73,26 +80,17 @@ module.exports = {
                     && connection_old !== undefined
                     && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
                     connection_old.destroy();
-                    connection = joinVoiceChannel({
-                        channelId: interaction.member.voice.channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.guild.voiceAdapterCreator,
-                        selfDeaf: false,
-                        selfMute: false
-                    });
-                } else if (connection_old === null 
-                            || connection_old === undefined){
-                        connection = joinVoiceChannel({
-                            channelId: interaction.member.voice.channelId,
-                            guildId: interaction.guildId,
-                            adapterCreator: interaction.guild.voiceAdapterCreator,
-                            selfDeaf: false,
-                            selfMute: false
-                        });
                 } else {
                     connection = connection_old;
                 }
-                interaction.deferReply({ ephemeral: true});
+                
+                connection = joinVoiceChannel({
+                    channelId: interaction.member.voice.channelId,
+                    guildId: interaction.guildId,
+                    adapterCreator: interaction.guild.voiceAdapterCreator,
+                    selfDeaf: false,
+                    selfMute: false
+                });
 
                 var params = api+path_audio+"search/"+words;
 
@@ -118,12 +116,12 @@ module.exports = {
                                 inputType: StreamType.Arbitrary,
                             });
                             player.play(resource);    
-                            interaction.editReply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                             
+                            interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                             
                         });
                     })
                 }).catch(function(error) {
                     console.log(error);
-                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                    interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
                 }); 
             }
         }
