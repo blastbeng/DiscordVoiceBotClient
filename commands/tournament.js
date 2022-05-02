@@ -11,7 +11,7 @@ const path_text="/chatbot_text/"
 function getSlashCommand() {
     var command = new SlashCommandBuilder()
     .setName('tournament')
-    .setDescription('Genera un torneo (Max 16 Utenti)')
+    .setDescription('Genera un torneo (Min 3 - Max 16 Utenti)')
     .addStringOption(option => option.setName('name').setDescription('Nome del torneo').setRequired(true))
     .addIntegerOption(option => option.setName('size').setDescription('Dimensione dei Team').setRequired(true))
     .addStringOption(option => option.setName('description').setDescription('Descrizione del torneo').setRequired(true))
@@ -34,7 +34,7 @@ module.exports = {
 
         var teamsize = interaction.options.getInteger('size');
         if (teamsize === 0 || teamsize > 17) {                  
-            var errorMsg = "Errore! Il numero dei partecipanti non può essere inferiore a 0 o maggiore di 16.";
+            var errorMsg = "Errore! La grandezza del team non può essere inferiore o uguale a 0 o maggiore di 16!";
             interaction.reply({ content: errorMsg, ephemeral: true });  
             return
         }

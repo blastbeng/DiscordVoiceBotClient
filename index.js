@@ -138,7 +138,7 @@ client.on('interactionCreate', async interaction => {
                     "method": "POST",
                     "hostname": hostname,
                     "port": port,
-                    "path": path_text+'tournament',
+                    "path": path_text+'tournament/regen',
                     "headers": {
                         'Content-Type': 'application/json',
                         "Content-Length": Buffer.byteLength(bodyData)
@@ -234,7 +234,7 @@ client.on('interactionCreate', async interaction => {
                             if (object.teamsize > 1) {
                                 embed = new MessageEmbed()
                                 .setColor('#0099ff')
-                                .setTitle('TORNEO: ' + name)
+                                .setTitle(object.name)
                                 .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                                 .setDescription(object.description)
                                 .setThumbnail(object.image)
@@ -253,7 +253,7 @@ client.on('interactionCreate', async interaction => {
                             } else {
                                 embed = new MessageEmbed()
                                 .setColor('#0099ff')
-                                .setTitle('TORNEO: ' + name)
+                                .setTitle(object.name)
                                 .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
                                 .setDescription(object.description)
                                 .setThumbnail(object.image)
@@ -296,9 +296,8 @@ client.on('interactionCreate', async interaction => {
                             .addComponents(
                                 new MessageButton()
                                     .setCustomId('tournament_regen')
-                                    .setLabel('Rigenera (Work in Progress)')
-                                    .setStyle('PRIMARY')
-                                    .setDisabled(true),
+                                    .setLabel('Rigenera')
+                                    .setStyle('PRIMARY'),
                             )
                             .addComponents(
                                 new MessageButton()
