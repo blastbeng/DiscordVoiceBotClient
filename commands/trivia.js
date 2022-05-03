@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getVoiceConnection, createAudioPlayer } = require('@discordjs/voice');
+const { createAudioPlayer } = require('@discordjs/voice');
 
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
