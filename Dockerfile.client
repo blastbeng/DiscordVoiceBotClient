@@ -18,5 +18,6 @@ RUN npm install
 
 # Bundle app source
 COPY . .
+RUN chmod +x entrypoint.sh
 
-CMD [ "node", "index.js" ]
+CMD ["./entrypoint.sh"]

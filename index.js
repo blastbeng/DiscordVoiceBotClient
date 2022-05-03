@@ -51,28 +51,22 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-client.on('ready', () => {const BOT_ID = config.BOT_ID;
-	const GUILD_ID = config.GUILD_ID;
-	const rest = new REST({
-		version: '9'
-	}).setToken(TOKEN);
+client.on('ready', () => {
+    const rest = new REST({ version: '9' }).setToken(config.BOT_TOKEN);
+
     (async () => {
-		try {
-			//rest.get(Routes.applicationGuildCommands(BOT_ID, GUILD_ID))
-			//	.then(data => {
-			//		const promises = [];
-			//		for (const command of data) {
-			//			const deleteUrl = `${Routes.applicationGuildCommands(BOT_ID, GUILD_ID)}/${command.id}`;
-			//			promises.push(rest.delete(deleteUrl));
-			//		}
-			//		return Promise.all(promises);
-			//});
-			rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), { body: commands })
-				.then(() => console.log('Successfully registered application commands.'))
-				.catch(console.error);
-		} catch (error) {
-			if (error) console.error(error);
-		}
+        try {
+            console.log('Started refreshing application (/) commands.');
+
+            await rest.put(
+                Routes.applicationGuildCommands(config.BOT_ID, config.GUILD_ID),
+                { body: commands },
+            );
+
+            console.log('Successfully reloaded application (/) commands.');
+        } catch (error) {
+            console.error(error);
+        }
     })();
 });
 
@@ -350,7 +344,6 @@ client.on('interactionCreate', async interaction => {
                         selfDeaf: false,
                         selfMute: false
                     });
-                    interaction.deferReply({ ephemeral: true});
     
     
                     var params = api+path_audio+"insult?text=none";
@@ -379,12 +372,12 @@ client.on('interactionCreate', async interaction => {
                                     inputType: StreamType.Arbitrary,
                                 });
                                 player.play(resource);      
-                                interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
+                                interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                             });
                         })
                     }).catch(function(error) {
                         console.log(error);
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
                     }); 
                 }
             }
