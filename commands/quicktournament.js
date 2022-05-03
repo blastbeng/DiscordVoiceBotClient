@@ -106,29 +106,46 @@ module.exports = {
                 
                     res.on("end", function() {
                         try {
-                            var object = JSON.parse(chunks)           
-                            var fieldsUsers = [];              
-                            var fieldsTeams = [];           
-                            var fieldsRounds = []; 
+                            var object = JSON.parse(chunks); 
+                            var embed = new MessageEmbed()
+                            .setColor('#0099ff')
+                            .setTitle(object.name)
+                            .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
+                            .setDescription(object.description)
+                            .setThumbnail(object.image)
 
-                            var i = 0;
-                            for (i = 0; i < object.users.length; i++) {
-                                var user = object.users[i];
-                                var fieldsUser = { name: user.username, value: user.title, inline: true }
-                                fieldsUsers.push(fieldsUser);     
-                            }
-                            
-                            if (i%3 !== 0){
-                                while(i%3 !== 0) {
-                                    var fieldsUser = { name: '\u200b', value: '\u200b', inline: true }
-                                    fieldsUsers.push(fieldsUser);     
-                                    i = i + 1;
+
+                            if(object.teamsize == 1){
+                                embed.addField('PARTECIPANTI:', '\u200b', false);
+                
+                                //var fieldsUsers = [];              
+                                //var fieldsTeams = [];           
+                                //var fieldsRounds = []; 
+
+                                var i = 0;
+                                for (i = 0; i < object.users.length; i++) {
+                                    var user = object.users[i];
+                                    //var fieldsUser = { name: user.username, value: user.title, inline: true }
+                                    //fieldsUsers.push(fieldsUser);     
+                                    embed.addField(user.username, user.title, true)
+                                }
+                                
+                                if (i%3 !== 0){
+                                    while(i%3 !== 0) {
+                                        //var fieldsUser = { name: '\u200b', value: '\u200b', inline: true }
+                                        //fieldsUsers.push(fieldsUser);     
+                                        embed.addField('\u200b', '\u200b', true)
+                                        i = i + 1;
+                                    }
                                 }
                             }
-                            
+                            if(object.teamsize > 1){
+                                embed.addField('\u200b', 'SQUADRE', false)
+                            }
+                            var k = 0;
                             if (object.teamsize > 1) {
-                                for (i = 0; i < object.teams.length; i++) {
-                                    var team = object.teams[i];
+                                for (k = 0; k < object.teams.length; k++) {
+                                    var team = object.teams[k];
                                     var users_add = "";
                                     for (var j = 0; j < team.users.length; j++) {
                                         var user = team.users[j];
@@ -140,20 +157,25 @@ module.exports = {
                                     } else {
                                         teamName = team.name;
                                     }
-                                    var fieldsTeam = { name: teamName, value: users_add, inline: true }
-                                    fieldsTeams.push(fieldsTeam);
+                                    //var fieldsTeam = { name: teamName, value: users_add, inline: true }
+                                    //fieldsTeams.push(fieldsTeam);
+                                    if(object.teamsize > 1){
+                                        embed.addField(teamName, users_add, true)
+                                    }
                                 }                    
-                                if (i%3 !== 0){
-                                    while(i%3 !== 0) {
-                                        var fieldsTeam = { name: '\u200b', value: '\u200b', inline: true }
-                                        fieldsTeams.push(fieldsUser);     
-                                        i = i + 1;
+                                if (k%3 !== 0 && object.teamsize > 1){
+                                    while(k%3 !== 0) {
+                                        //var fieldsTeam = { name: '\u200b', value: '\u200b', inline: true }
+                                        //fieldsTeams.push(fieldsTeam);    
+                                        embed.addField('\u200b', '\u200b', true) 
+                                        k = k + 1;
                                     }
                                 }                            
                             }
-
-                            for (i = 0; i < object.rounds.length; i++) {
-                                var round = object.rounds[i];
+                            embed.addField('\u200b', 'MATCH GENERATI', false)
+                            var h = 0;
+                            for (h = 0; h < object.rounds.length; h++) {
+                                var round = object.rounds[h];
                                 var teams = "";
                                 teams = round.teams[0].name + "     VS     " + round.teams[1].name;
 
@@ -170,51 +192,18 @@ module.exports = {
 
                                 var users = user0 + "     VS     " + user1;
                                 if (round.teams[0].name === 0 && round.teams[1].name === 0){
-                                    var fieldRound = { name: users, value: '\u200b', inline: false };
-                                    fieldsRounds.push(fieldRound);
+                                    //var fieldRound = { name: users, value: '\u200b', inline: false };
+                                    //fieldsRounds.push(fieldRound);
+                                    embed.addField(users, '\u200b', false) 
                                 } else {                            
-                                    var fieldRound = { name: teams, value: users, inline: false };
-                                    fieldsRounds.push(fieldRound);
+                                    //var fieldRound = { name: teams, value: users, inline: false };
+                                    //fieldsRounds.push(fieldRound);
+                                    embed.addField(teams, users, false) 
                                 }
                             }
-                            var embed;
-                            if (object.teamsize > 1) {
-                                embed = new MessageEmbed()
-                                .setColor('#0099ff')
-                                .setTitle(object.name)
-                                .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
-                                .setDescription(object.description)
-                                .setThumbnail(object.image)
-                                .addField('\u200b', '\u200b')
-                                .addField('PARTECIPANTI:', '\u200b', false)
-                                .addFields(fieldsUsers)
-                                .addField('\u200b', '\u200b')
-                                .addField('SQUADRE', '\u200b', false)
-                                .addFields(fieldsTeams)
-                                .addField('\u200b', '\u200b')
-                                .addField('MATCH GENERATI', '\u200b', false)
-                                .addFields(fieldsRounds)
-                                .setImage(object.image)
+                            embed.setImage(object.image)
                                 .setTimestamp()
                                 .setFooter({ text: 'Creato da quel pezzente di '  + object.author, iconURL: object.guild_image });
-                            } else {
-                                embed = new MessageEmbed()
-                                .setColor('#0099ff')
-                                .setTitle(object.name)
-                                .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
-                                .setDescription(object.description)
-                                .setThumbnail(object.image)
-                                .addField('\u200b', '\u200b')
-                                .addField('PARTECIPANTI:', '\u200b', false)
-                                .addFields(fieldsUsers)
-                                .addField('\u200b', '\u200b')
-                                .addField('MATCH GENERATI', '\u200b', false)
-                                .addFields(fieldsRounds)
-                                .setImage(object.image)
-                                .setTimestamp()
-                                .setFooter({ text: 'Creato da quel pezzente di '  + object.author, iconURL: object.guild_image });
-
-                            }
                             const rowInfo1 = new MessageActionRow()
                             .addComponents(
                                 new MessageButton()
