@@ -2,8 +2,10 @@
     "BOT_TOKEN" : "BOT_TOKEN",
     "BOT_ID" : "BOT_ID",
     "GUILD_ID" : "GUILD_ID",
-    "API_URL"   : "http://YOURIP:5080",
     "API_HOSTNAME"   : "YOURIP",
+    "API_URL"   : "http://YOURIP:5080",
     "API_PORT"   : 5080,
+    "TRIVIA_API_URL"   : "http://YOURIP:5080",
+    "TRIVIA_API_PORT"   : 5080,
     "CACHE_DIR" : "/tmp/DiscordVoiceBot/audio"
 }

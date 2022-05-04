@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const config = require("../config.json");
 const http = require("http");
 
-const port=config.API_PORT;
+const port=config.TRIVIA_API_PORT;
 const hostname=config.API_HOSTNAME;
 const path_trivia="/chatbot_trivia/"
 
