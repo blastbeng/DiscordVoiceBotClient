@@ -5,7 +5,7 @@ const http = require("http");
 
 const port=config.TRIVIA_API_PORT;
 const hostname=config.API_HOSTNAME;
-const path_trivia="/chatbot_trivia/"
+const path_trivia=config.TRIVIA_API_PATH
 
 
 module.exports = {

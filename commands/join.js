@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 const path = config.CACHE_DIR;
 const api=config.API_URL;
-const path_audio="/chatbot_audio/"
+const path_audio=config.API_PATH_AUDIO
 
 module.exports = {
     data: new SlashCommandBuilder()

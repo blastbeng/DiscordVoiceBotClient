@@ -13,8 +13,8 @@ const path = config.CACHE_DIR;
 const hostname=config.API_HOSTNAME;
 const api=config.API_URL;
 const port=config.API_PORT;
-const path_audio="/chatbot_audio/"
-const path_text="/chatbot_text/"
+const path_audio=config.API_PATH_AUDIO
+const path_text=config.API_PATH_TEXT
 
 
 module.exports = {

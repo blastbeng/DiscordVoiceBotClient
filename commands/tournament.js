@@ -6,7 +6,7 @@ const http = require("http");
 
 const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
-const path_text="/chatbot_text/"
+const path_text=config.API_PATH_TEXT
 
 function getSlashCommand() {
     var command = new SlashCommandBuilder()

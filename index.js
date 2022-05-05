@@ -32,9 +32,9 @@ const fetch = require('node-fetch');
 const api=config.API_URL;
 const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
-const path_audio="/chatbot_audio/"
-const path_music="/chatbot_music/"
-const path_text="/chatbot_text/"
+const path_audio=config.API_PATH_AUDIO
+const path_music=API_PATH_MUSIC
+const path_text=config.API_PATH_TEXT
 
 setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
 

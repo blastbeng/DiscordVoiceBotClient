@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const path = config.CACHE_DIR;
 const api=config.API_URL;
 const text="&text=";
-const path_text="/chatbot_text/"
+const path_text=config.API_PATH_TEXT
 
 module.exports = {
     data: new SlashCommandBuilder()
