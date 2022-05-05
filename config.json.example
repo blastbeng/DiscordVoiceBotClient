@@ -10,6 +10,5 @@
     "API_PATH_MUSIC" : API_PATH_MUSIC,
     "TRIVIA_API_URL"   : "http://YOURIP:5080",
     "TRIVIA_API_PORT"   : 5080,
-    "TRIVIA_API_PATH" : "/trivia/",
     "CACHE_DIR" : "/tmp/DiscordVoiceBot/audio"
 }

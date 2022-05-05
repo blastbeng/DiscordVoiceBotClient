@@ -17,7 +17,7 @@ module.exports = {
             "method": "GET",
             "hostname": hostname,
             "port": port,
-            "path": path_trivia+'getquiz?author='+encodeURIComponent(interaction.member.user.username)
+            "path": '/quiz/create?author='+encodeURIComponent(interaction.member.user.username)+'&author_id='+interaction.member.user.id
         }
     
         const req = http.request(options, function(res) {
@@ -36,10 +36,43 @@ module.exports = {
     
                 try {
                     var object = JSON.parse(chunks);
-                    
-                    var quizname = "Quiz N° " + object.id;
 
-                    interaction.reply({ content: quizname, ephemeral: true });  
+                    const options = {
+                        "method": "GET",
+                        "hostname": hostname,
+                        "port": port,
+                        "path": '/quiz/get?quiz_id='+object.Quiz_id
+                    }
+                
+                    const req = http.request(options, function(res) {
+                        
+                        req.on('error', function (error) {
+                            console.log(error);
+                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                        });
+                        var chunks = [];     
+                    
+                        res.on("data", function (chunk) {
+                            chunks.push(chunk);
+                        });
+                    
+                        res.on("end", function() {
+                
+                            try {
+                                var object = JSON.parse(chunks);
+            
+                                interaction.reply({ content: object.id, ephemeral: true });  
+                                 
+                            } catch (error) {
+                                interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
+                                console.error(error);
+                            }
+                            
+                        });
+                    
+                    });         
+                    
+                    req.end()
                      
                 } catch (error) {
                     interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });

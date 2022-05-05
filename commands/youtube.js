@@ -11,7 +11,7 @@ const path = config.CACHE_DIR;
 const api=config.API_URL;
 const port=config.API_PORT;
 const hostname=config.API_HOSTNAME;
-const path_music=API_PATH_MUSIC
+const path_music=config.API_PATH_MUSIC
 
 module.exports = {
     data: new SlashCommandBuilder()
