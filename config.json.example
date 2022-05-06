@@ -8,7 +8,5 @@
     "API_PATH_TEXT" : config.API_PATH_TEXT,
     "API_PATH_AUDIO" : config.API_PATH_AUDIO,
     "API_PATH_MUSIC" : API_PATH_MUSIC,
-    "TRIVIA_API_URL"   : "http://YOURIP:5080",
-    "TRIVIA_API_PORT"   : 5080,
     "CACHE_DIR" : "/tmp/DiscordVoiceBot/audio"
 }

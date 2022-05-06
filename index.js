@@ -18,6 +18,7 @@ const fs = require('fs');
 const findRemoveSync = require('find-remove');
 const config = require("./config.json");
 const http = require("http");
+const wait = require('node:timers/promises').setTimeout;
 
 const client = new Client({ intents: new Intents(32767) });
 addSpeechEvent(client, { lang: "it-IT", profanityFilter: false });
@@ -105,6 +106,13 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
       console.error(error);
   }
 });
+
+function postDeleteReply(interaction, msg) {
+	return new Promise(resolve => {
+        interaction.reply({ content: msg, ephemeral: false });  
+		setTimeout(() => interaction.deleteReply(), 10000);
+	});
+}
 
 
 
