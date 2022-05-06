@@ -521,6 +521,9 @@ client.on('interactionCreate', async interaction => {
 
 client.on("messageCreate", (msg) => {
         try{            
+            if (msg.channelId === '972093345306411010' && !msg.member?.user.bot) {
+                msg.delete();
+            }
             if (msg.member?.voice !== null
                 && msg.member?.voice != undefined
                 && msg.member?.voice.channel != null
