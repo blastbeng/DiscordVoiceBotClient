@@ -579,7 +579,14 @@ client.on("speech", (msg) => {
                 || new RegExp(regex, "i").test('scemo') 
                 || new RegExp(regex, "i").test('bot') 
                 || new RegExp(regex, "i").test('boat')) {
-                var words = msg.content.toLowerCase().replace(/pezzente:/, "").replace(/scemo:/, "").replace(/bot:/, "").replace(/boat:/, "").trim();
+
+                var words = msg.content.toLowerCase()
+                    .replace(/pezzente:/, "")
+                    .replace(/scemo:/, "")
+                    .replace(/bot:/, "")
+                    .replace(/boat:/, "")
+                    .trim();
+
                 if (words === ''){
                     words = msg.content.toLowerCase();
                 }
