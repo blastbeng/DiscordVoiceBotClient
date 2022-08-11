@@ -114,6 +114,10 @@ function postDeleteReply(interaction, msg) {
 	});
 }
 
+function escapeRegExp(string){
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
 
 
 client.on('interactionCreate', async interaction => {
@@ -566,12 +570,18 @@ client.on("speech", (msg) => {
             && msg.content !== ''
             && msg.content !== undefined 
             && msg.content !== 'undefined') {
+
+            var regex = '\\b';
+            regex += escapeRegExp(msg.content.toLowerCase());
+            regex += '\\b';
         
-            if ((msg.content.toLowerCase().includes('pezzente') || msg.content.toLowerCase().includes('scemo') || msg.content.toLowerCase().includes('bot') || msg.content.toLowerCase().includes('boat'))
-                && !msg.content.toLowerCase().includes('cerca') && !msg.content.toLowerCase().includes('play') && !msg.content.toLowerCase().includes('riproduci')) {
-                var words = msg.content.toLowerCase().replace('pezzente','').replace('scemo','').replace('bot','').replace('boat','').trim();
+            if (new RegExp(regex, "i").test('pezzente') 
+                || new RegExp(regex, "i").test('scemo') 
+                || new RegExp(regex, "i").test('bot') 
+                || new RegExp(regex, "i").test('boat')) {
+                var words = msg.content.toLowerCase().replace(/pezzente:/, "").replace(/scemo:/, "").replace(/bot:/, "").replace(/boat:/, "").trim();
                 if (words === ''){
-                    words = 'ciao';
+                    words = msg.content.toLowerCase();
                 }
                 var params = api+path_audio+"ask/"+words;
                 fetch(
