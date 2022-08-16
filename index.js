@@ -20,7 +20,7 @@ const config = require("./config.json");
 const http = require("http");
 const wait = require('node:timers/promises').setTimeout;
 
-const client = new Client({ intents: new Intents(32767) });
+const client = new Client({ intents: 32767 });
 addSpeechEvent(client, { lang: "it-IT", profanityFilter: false });
 
 const TOKEN = config.BOT_TOKEN;
@@ -571,14 +571,16 @@ client.on("speech", (msg) => {
             && msg.content !== undefined 
             && msg.content !== 'undefined') {
 
-            var regex = '\\b';
-            regex += escapeRegExp(msg.content.toLowerCase());
-            regex += '\\b';
+            //var regex = '\\b';
+            //regex += escapeRegExp(msg.content.toLowerCase());
+            //regex += '\\b';
+
+            var wordsss = msg.content.toLowerCase();
         
-            if (new RegExp(regex, "i").test('pezzente') 
-                || new RegExp(regex, "i").test('scemo') 
-                || new RegExp(regex, "i").test('bot') 
-                || new RegExp(regex, "i").test('boat')) {
+            if (new RegExp('^pezzente', "i").test(wordsss) 
+                || new RegExp('^scemo', "i").test(wordsss) 
+                || new RegExp('^bot', "i").test(wordsss) 
+                || new RegExp('^boat', "i").test(wordsss)) {
 
                 var words = msg.content.toLowerCase()
                     .replace(/pezzente:/, "")

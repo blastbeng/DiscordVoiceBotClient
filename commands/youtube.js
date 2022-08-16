@@ -17,14 +17,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('youtube')
         .setDescription('Il pezzente riproduce audio da un video di youtube')
-        .addStringOption(option =>
-            option.setName('input')
-                .setDescription('Hai un link o vuoi cercare qualcosa?')
-                .setRequired(true)
-                .addChoice('ricerca','ricerca')
-                .addChoice('link','link')
-                )
-            .addStringOption(option => option.setName('video').setDescription('link o ricerca').setRequired(true)),
+            .addStringOption(option => option.setName('video').setDescription('video da cercare').setRequired(true)),
     async execute(interaction) {
         if (interaction.member.voice === null 
             || interaction.member.voice === undefined 
@@ -49,98 +42,9 @@ module.exports = {
                 selfDeaf: false,
                 selfMute: false
             });
-
-            const input = interaction.options.getString('input');            
+       
             const video = interaction.options.getString('video');
             
-            if( input === 'link' ) {
-
-                if ( !video.startsWith('http')) {                    
-                    interaction.reply({ content: 'Devi inserire un url di youtube se vuoi riprodurre da un link', ephemeral: true });   
-                } else {
-                    var params = api+path_music+'youtube/get?url='+encodeURIComponent(video);
-                    fetch(
-                        params,
-                        {
-                            method: 'GET',
-                            headers: { 'Accept': '*/*' }
-                        }
-                    ).then(res => {
-                        new Promise((resolve, reject) => {
-                            var file = Math.random().toString(36).slice(2)+".mp3";
-                            //var file = "temp.wav";
-                            var outFile = path+"/"+file;
-                            const dest = fs.createWriteStream(outFile);
-                            res.body.pipe(dest);
-                            res.body.on('end', () => resolve());
-                            dest.on('error', reject);
-
-                            dest.on('finish', function(){      
-                                connection.subscribe(player);                      
-                                const resource = createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
-                                });
-                                player.play(resource); 
-                                const options = {
-                                    "method": "GET",
-                                    "hostname": hostname,
-                                    "port": port,
-                                    "path": path_music+'youtube/info?url='+encodeURIComponent(video)
-                                }
-                                const req = http.request(options, function(res) {
-                                    
-                                    req.on('error', function (error) {
-                                        console.log(error);
-                                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
-                                    });
-                                    var chunks = [];
-                                
-                                    res.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                    });
-                                
-                                    res.on("end", function() {
-                                        try{
-                                            var body = Buffer.concat(chunks);
-                                            var object = JSON.parse(body.toString())
-                                            
-                                            const rowStop = new MessageActionRow()
-                                            .addComponents(
-                                                new MessageButton()
-                                                    .setCustomId('stop')
-                                                    .setLabel('Stop')
-                                                    .setStyle('PRIMARY'),
-                                            );
-                                            if (object.length === 0) {                                
-                                                interaction.reply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
-                                            } else {
-                                            var video = object[0];
-                                            const embed = new MessageEmbed()
-                                                    .setColor('#0099ff')
-                                                    .setTitle(video.title)
-                                                    .setURL(video.link)
-                                                    .setDescription(video.link);
-                                            
-                                            interaction.reply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
-                                            }
-                                         
-                                        } catch (error) {
-                                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
-                                            console.error(error);
-                                        }
-                                    });
-                                
-                                });         
-                                
-                                req.end()
-                            });
-                        })
-                    }).catch(function(error) {
-                        console.log(error);
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                    }); 
-                }
-            } else if( input === 'ricerca' ) {
 
                 if ( video.startsWith('http')) {                    
                     interaction.reply({ content: 'Devi selezionare "link" se vuoi riprodurre un url di youtube', ephemeral: true });   
@@ -202,7 +106,6 @@ module.exports = {
                     
                     req.end();
                 }
-            }
         }
 
     }

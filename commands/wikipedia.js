@@ -16,57 +16,11 @@ const path_text=config.API_PATH_TEXT
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('wikipedia')
-        .setDescription('Il pezzente cerca qualcosa su wikipedia')        
-        .addStringOption(option =>
-            option.setName('type')
-                .setDescription('Vuoi riprodurre via TTS o mostrare in Chat?')
-                .setRequired(true)
-                .addChoice('TTS', 'TTS')
-                .addChoice('Chat', 'Chat'))
+        .setDescription('Il pezzente cerca qualcosa su wikipedia')      
         .addStringOption(option => option.setName('input').setDescription('Che cosa vuoi cercare?').setRequired(true)),
     async execute(interaction) {     
 
         const words = interaction.options.getString('input');
-        const type = interaction.options.getString('type');
-        if (type === 'Chat') {
-                const options = {
-                    "method": "GET",
-                    "hostname": hostname,
-                    "port": port,
-                    "path": path_text+'search/'+encodeURIComponent(words)
-                }
-
-                const req = http.request(options, function(res) {
-                    
-                    req.on('error', function (error) {
-                        console.log(error);
-                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
-                    });
-                    var chunks = [];     
-                
-                    res.on("data", function (chunk) {
-                        chunks.push(chunk);
-                    });
-                
-                    res.on("end", function() {
-
-                        try {
-                            var body = Buffer.concat(chunks);
-                            var msgsearch = body.toString();
-                            
-                            interaction.reply({ content: msgsearch, ephemeral: false });  
-                             
-                        } catch (error) {
-                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
-                            console.error(error);
-                        }
-                        
-                    });
-                
-                });         
-                
-                req.end()
-        } else if (type === 'TTS') {         
 
             if (interaction.member.voice === null 
                 || interaction.member.voice === undefined 
@@ -124,7 +78,6 @@ module.exports = {
                     interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
                 }); 
             }
-        }
 
     }
 }; 

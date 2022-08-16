@@ -21,12 +21,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('insult')
         .setDescription('Il pezzente insulta qualcuno')        
-        .addStringOption(option =>
-            option.setName('type')
-                .setDescription('Vuoi riprodurre via TTS o mostrare in Chat?')
-                .setRequired(true)
-                .addChoice('TTS', 'TTS')
-                .addChoice('Chat', 'Chat'))
         .addUserOption(option => option.setName('user')
         	.setDescription('Chi vuoi insultare? (Puoi lasciare vuoto)')
 		.setRequired(true)),
@@ -38,55 +32,6 @@ module.exports = {
         if (user !== null && user !== undefined){
             words = interaction.options.getUser('user').username;
         }
-        const type = interaction.options.getString('type');
-
-        if (type === 'Chat') {
-
-            var params = "";
-            if (words === null || words === undefined){
-                params = path_text+"insult?text=none";
-            } else {
-                params = path_text+"insult?text="+encodeURIComponent(words);
-            }
-
-            const options = {
-                "method": "GET",
-                "hostname": hostname,
-                "port": port,
-                "path": params
-            }
-
-            const req = http.request(options, function(res) {
-                
-                req.on('error', function (error) {
-                    console.log(error);
-                    interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
-                });
-                var chunks = [];     
-            
-                res.on("data", function (chunk) {
-                    chunks.push(chunk);
-                });
-            
-                res.on("end", function() {
-                        try {
-                        var body = Buffer.concat(chunks);
-                        var msgsearch = body.toString();
-                        
-                        interaction.reply({ content: msgsearch, ephemeral: false });  
-                    
-                                            
-                    } catch (error) {
-                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
-                        console.error(error);
-                    }
-                    
-                });
-            
-            });         
-            
-            req.end()
-        } else if (type === 'TTS') { 
 
             if (interaction.member.voice === null 
                 || interaction.member.voice === undefined 
@@ -155,7 +100,6 @@ module.exports = {
                     interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
                 }); 
             }
-        }
 
     }
 }; 
