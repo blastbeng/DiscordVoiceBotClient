@@ -583,10 +583,10 @@ client.on("speech", (msg) => {
                 || new RegExp('^boat', "i").test(wordsss)) {
 
                 var words = msg.content.toLowerCase()
-                    .replace(/pezzente:/, "")
-                    .replace(/scemo:/, "")
-                    .replace(/bot:/, "")
-                    .replace(/boat:/, "")
+                    .replace(/pezzente/, "")
+                    .replace(/scemo/, "")
+                    .replace(/bot/, "")
+                    .replace(/boat/, "")
                     .trim();
 
                 if (words === ''){
