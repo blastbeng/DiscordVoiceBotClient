@@ -12,8 +12,8 @@ const path_jokes_audio=config.API_PATH_JOKES_AUDIO
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('chuck')
-        .setDescription('Chuck Norris.'),
+        .setName('joke')
+        .setDescription('Barzelletta a caso'),
     async execute(interaction) {
         if (interaction.member.voice === null 
             || interaction.member.voice === undefined 
@@ -40,7 +40,7 @@ module.exports = {
             });
             interaction.deferReply({ ephemeral: true});
 
-            var params = api+path_jokes_audio+"chuck";
+            var params = api+path_jokes_audio+"joke";
 
             fetch(
                 params,

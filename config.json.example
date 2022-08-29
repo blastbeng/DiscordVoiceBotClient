@@ -8,6 +8,7 @@
     "API_PATH_TEXT" : "/chatbot_text/",
     "API_PATH_AUDIO" : "/chatbot_audio/",
     "API_PATH_MUSIC" : "/chatbot_music/",
-    "API_PATH_JOKES" : "/jokes/",
+    "API_PATH_JOKES_TEXT" : "/jokes_text/",
+    "API_PATH_JOKES_AUDIO" : "/jokes_audio/",
     "CACHE_DIR" : "/tmp/DiscordVoiceBot/audio"
 }
