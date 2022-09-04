@@ -3,6 +3,7 @@ const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioReso
 
 const fs = require('fs');
 const config = require("../config.json");
+require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
 const http = require("http");
@@ -45,38 +46,51 @@ module.exports = {
                     selfDeaf: false,
                     selfMute: false
                 });
+                interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {         
 
-                var params = api+path_audio+"search/"+words;
+                    var params = api+path_audio+"search/"+words;
 
-                fetch(
-                    params,
-                    {
-                        method: 'GET',
-                        headers: { 'Accept': '*/*' }
-                    }
-                ).then(res => {
-                    new Promise((resolve, reject) => {
-                        var file = Math.random().toString(36).slice(2)+".wav";
-                        //var file = "temp.wav";
-                        var outFile = path+"/"+file;
-                        const dest = fs.createWriteStream(outFile);
-                        res.body.pipe(dest);
-                        res.body.on('end', () => resolve());
-                        dest.on('error', reject);
+                    fetch(
+                        params,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': '*/*' }
+                        }
+                    ).then(res => {
+                        new Promise((resolve, reject) => {
+                            //var file = Math.random().toString(36).slice(2)+".wav";
+                            var file = "temp.wav";
+                            var outFile = path+"/"+file;
+                            const dest = fs.createWriteStream(outFile);
+                            res.body.pipe(dest);
+                            res.body.on('end', () => resolve());
+                            dest.on('error', reject);        
 
-                        dest.on('finish', function(){       
-                            connection.subscribe(player);                     
-                            const resource = createAudioResource(outFile, {
-                                inputType: StreamType.Arbitrary,
+                            dest.on('finish', function(){       
+                                connection.subscribe(player);                     
+                                const resource = createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                });
+                                player.on('error', error => {
+                                    console.log(error);
+                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                });
+                                
+                                player.on('error', error => {
+                                    console.log(error);
+                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                });
+                                player.play(resource);                          
                             });
-                            player.play(resource);    
-                            interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true });                             
-                        });
-                    })
-                }).catch(function(error) {
-                    console.log(error);
-                    interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
-                }); 
+                        }).catch(function(error) {
+                            console.log(error);
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                        }); 
+                    }).catch(function(error) {
+                        console.log(error);
+                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
+                    }); 
+                });
             }
 
     }

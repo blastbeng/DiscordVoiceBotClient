@@ -3,12 +3,17 @@ const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioReso
 
 const fs = require('fs');
 const config = require("../config.json");
+require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
+
+
 
 const path = config.CACHE_DIR;
 const api=config.API_URL;
 const path_jokes_audio=config.API_PATH_JOKES_AUDIO
+
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -38,39 +43,47 @@ module.exports = {
                 selfDeaf: false,
                 selfMute: false
             });
-            interaction.deferReply({ ephemeral: true});
+            //interaction.deferReply({ ephemeral: true});
+            interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {           
 
-            var params = api+path_jokes_audio+"random";
+                var params = api+path_jokes_audio+"random";
 
-            fetch(
-                params,
-                {
-                    method: 'GET',
-                    headers: { 'Accept': '*/*' }
-                }
-            ).then(res => {
-                new Promise((resolve, reject) => {
-                    var file = Math.random().toString(36).slice(2)+".wav";
-                    //var file = "temp.wav";
-                    var outFile = path+"/"+file;
-                    const dest = fs.createWriteStream(outFile);
-                    res.body.pipe(dest);
-                    res.body.on('end', () => resolve());
-                    dest.on('error', reject);
+                fetch(
+                    params,
+                    {
+                        method: 'GET',
+                        headers: { 'Accept': '*/*' }
+                    }
+                ).then(res => {
+                    new Promise((resolve, reject) => {
+                        //var file = Math.random().toString(36).slice(2)+".wav";
+                        var file = "temp.wav";
+                        var outFile = path+"/"+file;
+                        const dest = fs.createWriteStream(outFile);
+                        res.body.pipe(dest);
+                        res.body.on('end', () => resolve());
+                        dest.on('error', reject);        
 
-                    dest.on('finish', function(){      
-                        connection.subscribe(player);                      
-                        const resource = createAudioResource(outFile, {
-                            inputType: StreamType.Arbitrary,
+                        dest.on('finish', function(){      
+                            connection.subscribe(player);                      
+                            const resource = createAudioResource(outFile, {
+                                inputType: StreamType.Arbitrary,
+                            });
+                            player.on('error', error => {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                            });
+                            player.play(resource);       
                         });
-                        player.play(resource);      
-                        interaction.editReply({ content: 'Il pezzente sta parlando', ephemeral: true });          
-                    });
-                })
-            }).catch(function(error) {
-                console.log(error);
-                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-            }); 
+                    }).catch(function(error) {
+                        console.log(error);
+                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                    }); 
+                }).catch(function(error) {
+                    console.log(error);
+                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                }); 
+            });
         }
 
     }

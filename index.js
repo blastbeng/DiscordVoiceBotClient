@@ -17,6 +17,7 @@ const {
 const fs = require('fs');
 const findRemoveSync = require('find-remove');
 const config = require("./config.json");
+require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const http = require("http");
 const wait = require('node:timers/promises').setTimeout;
 
@@ -37,7 +38,7 @@ const path_audio=config.API_PATH_AUDIO
 const path_music=config.API_PATH_MUSIC
 const path_text=config.API_PATH_TEXT
 
-setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
+//setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -48,11 +49,11 @@ client.commands = new Collection();
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    commands.push(command.data.toJSON());
+    //commands.push(command.data.toJSON());
     client.commands.set(command.data.name, command);
 }
 
-client.on('ready', () => {
+/**client.on('ready', () => {
     const rest = new REST({ version: '9' }).setToken(config.BOT_TOKEN);
 
     (async () => {
@@ -69,7 +70,7 @@ client.on('ready', () => {
             console.error(error);
         }
     })();
-});
+});*/
 
 client.on('voiceStateUpdate', (oldMember, newMember) => {
   try{            
@@ -369,13 +370,13 @@ client.on('interactionCreate', async interaction => {
                         }
                     ).then(res => {
                         new Promise((resolve, reject) => {
-                            var file = Math.random().toString(36).slice(2)+".wav";
-                            //var file = "temp.wav";
+                            //var file = Math.random().toString(36).slice(2)+".wav";
+                            var file = "temp.wav";
                             var outFile = path+"/"+file;
                             const dest = fs.createWriteStream(outFile);
                             res.body.pipe(dest);
                             res.body.on('end', () => resolve());
-                            dest.on('error', reject);
+                            dest.on('error', reject);        
     
     
                             dest.on('finish', function(){      
@@ -383,10 +384,17 @@ client.on('interactionCreate', async interaction => {
                                 const resource = createAudioResource(outFile, {
                                     inputType: StreamType.Arbitrary,
                                 });
+                                player.on('error', error => {
+                                    console.log(error);
+                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                });
                                 player.play(resource);      
                                 interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                             });
-                        })
+                        }).catch(function(error) {
+                            console.log(error);
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                        }); 
                     }).catch(function(error) {
                         console.log(error);
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
@@ -438,12 +446,16 @@ client.on('interactionCreate', async interaction => {
                                 const dest = fs.createWriteStream(outFile);
                                 res.body.pipe(dest);
                                 res.body.on('end', () => resolve());
-                                dest.on('error', reject);
+                                dest.on('error', reject);        
 
                                 dest.on('finish', function(){      
                                     connection.subscribe(player);                      
                                     const resource = createAudioResource(outFile, {
                                         inputType: StreamType.Arbitrary,
+                                    });
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
                                     });
                                     player.play(resource); 
                                     const row = new MessageActionRow()
@@ -506,7 +518,10 @@ client.on('interactionCreate', async interaction => {
                                     
                                     req.end()  
                                 });
-                            })
+                            }).catch(function(error) {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                            }); 
                         }).catch(function(error) {
                             console.log(error);
                             interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
@@ -601,8 +616,8 @@ client.on("speech", (msg) => {
                     }
                 ).then(res => {
                     new Promise((resolve, reject) => {
-                        var file = Math.random().toString(36).slice(2)+".wav";
-                        //var file = "temp.wav";
+                        //var file = Math.random().toString(36).slice(2)+".wav";
+                        var file = "temp.wav";
                         var outFile = path+"/"+file;
                         const dest = fs.createWriteStream(outFile);
                         res.body.pipe(dest);
@@ -613,9 +628,16 @@ client.on("speech", (msg) => {
                             const resource = createAudioResource(outFile, {
                                 inputType: StreamType.Arbitrary,
                             });
+                            player.on('error', error => {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                            });
                             player.play(resource);      
                         });
-                    })
+                    }).catch(function(error) {
+                        console.log(error);
+                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                    }); 
                 }).catch(function(error) {
                     console.log(error);
                 }); 

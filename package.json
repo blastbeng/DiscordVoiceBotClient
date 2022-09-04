@@ -16,8 +16,8 @@
     "discord-speech-recognition": "^3.0.1",
     "discord.js": "^14.2.0",
     "ffmpeg-static": "^5.0.2",
+    "find-remove": "^4.0.4",
     "node-fetch": "^2.6.7",
-    "tweetnacl": "^1.0.3",
-    "find-remove": "^4.0.4"
+    "tweetnacl": "^1.0.3"
   }
 }

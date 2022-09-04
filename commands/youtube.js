@@ -3,6 +3,7 @@ const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioReso
 const { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const config = require("../config.json");
+require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
 const http = require("http");
