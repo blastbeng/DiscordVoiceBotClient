@@ -38,6 +38,8 @@ const path_audio=config.API_PATH_AUDIO
 const path_music=config.API_PATH_MUSIC
 const path_text=config.API_PATH_TEXT
 
+let playing = false;
+
 //setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -584,25 +586,41 @@ client.on("speech", (msg) => {
             && msg.content !== null 
             && msg.content !== ''
             && msg.content !== undefined 
-            && msg.content !== 'undefined') {
+            && msg.content !== 'undefined'
+            && config.ENABLED) {
 
             //var regex = '\\b';
             //regex += escapeRegExp(msg.content.toLowerCase());
             //regex += '\\b';
 
             var wordsss = msg.content.toLowerCase();
-        
-            if (new RegExp('^pezzente', "i").test(wordsss) 
+
+            //let randMinutes = Math.floor(Math.random() * 59);
+            //let date_ob = new Date();
+            //let minutes = date_ob.getMinutes();
+            // TEST
+            // randMinutes = date_ob.getMinutes();
+            // TEST
+
+            if (new RegExp('^disabilita', "i").test(wordsss)
+                || new RegExp('^disable', "i").test(wordsss)) {
+                config.AUTONOMOUS = false;
+            } else if (config.AUTONOMOUS
+                //|| randMinutes === minutes 
+                || new RegExp('^pezzente', "i").test(wordsss) 
                 || new RegExp('^scemo', "i").test(wordsss) 
                 || new RegExp('^bot', "i").test(wordsss) 
                 || new RegExp('^boat', "i").test(wordsss)) {
-
+                    
                 var words = msg.content.toLowerCase()
+                if(!config.AUTONOMOUS){
+                    words = msg.content.toLowerCase()
                     .replace(/pezzente/, "")
                     .replace(/scemo/, "")
                     .replace(/bot/, "")
                     .replace(/boat/, "")
                     .trim();
+                }
 
                 if (words === ''){
                     words = msg.content.toLowerCase();
@@ -624,19 +642,33 @@ client.on("speech", (msg) => {
                         res.body.on('end', () => resolve());
                         dest.on('error', reject);        
                         dest.on('finish', function(){     
-                            connection.subscribe(player);                       
-                            const resource = createAudioResource(outFile, {
-                                inputType: StreamType.Arbitrary,
-                            });
-                            player.on('error', error => {
-                                console.log(error);
-                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                            });
-                            player.play(resource);      
+                            if (!playing) {
+                                connection.subscribe(player);                       
+                                const resource = createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                });
+                                player.on('error', error => {
+                                    console.log(error);  
+                                });
+                                player.on(AudioPlayerStatus.Playing, () => {
+                                    playing = true;
+                                });
+                                player.on(AudioPlayerStatus.Idle, () => {
+                                    playing = false;
+                                });
+                                player.on(AudioPlayerStatus.AutoPased, () => {
+                                    playing = false;
+                                });
+                                player.on(AudioPlayerStatus.Paused, () => {
+                                    playing = false;
+                                });
+                                player.play(resource); 
+                            } else {
+                                wait(5000);
+                            }   
                         });
                     }).catch(function(error) {
                         console.log(error);
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
                     }); 
                 }).catch(function(error) {
                     console.log(error);

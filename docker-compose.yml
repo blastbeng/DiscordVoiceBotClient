@@ -1,0 +1,13 @@
+---
+version: "3.3"
+services:
+  scemo-pezzente-discord:
+    container_name: scemo-pezzente-discord
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    image: "scemo-pezzente-discord:latest"
+    restart: "no"
+    volumes:
+      - "/tmp/scemo-pezzente-discord:/tmp/scemo-pezzente-discord"
