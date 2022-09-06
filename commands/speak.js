@@ -46,7 +46,7 @@ module.exports = {
 
                 const words = interaction.options.getString('input');
 
-                var params = api+path_audio+"repeat/learn/"+words;
+                var params = api+path_audio+"repeat/learn/user/"+interaction.member.user.username+"/"+words;
 
                 fetch(
                     params,
