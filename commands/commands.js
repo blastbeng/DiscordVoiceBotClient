@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
-    MessageActionRow, 
-    MessageButton
+    ActionRowBuilder, 
+    ButtonBuilder
 } = require('discord.js');
 
 
@@ -11,21 +11,21 @@ module.exports = {
         .setDescription('Mostra i comandi del pezzente'),
     async execute(interaction) {
         try {                            
-            const row = new MessageActionRow()
+            const row = new ActionRowBuilder()
             .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                     .setCustomId('stop')
                     .setLabel('Stop')
                     .setStyle('PRIMARY'),
             )
             .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                     .setCustomId('leave')
                     .setLabel('Leave')
                     .setStyle('PRIMARY'),
             )
             .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                     .setCustomId('insult')
                     .setLabel('Insult')
                     .setStyle('PRIMARY'),

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
 
 const config = require("../config.json");
 const http = require("http");
@@ -115,7 +115,7 @@ module.exports = {
             res.on("end", function() {
                 try {
                     var object = JSON.parse(chunks); 
-                    var embed = new MessageEmbed()
+                    var embed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle(object.name)
                     .setAuthor({ name: object.author, iconURL: object.author_image, url: '' })
@@ -212,39 +212,39 @@ module.exports = {
                     embed.setImage(object.image)
                         .setTimestamp()
                         .setFooter({ text: 'Creato da quel pezzente di '  + object.author, iconURL: object.guild_image });
-                    const rowInfo1 = new MessageActionRow()
+                    const rowInfo1 = new ActionRowBuilder()
                     .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                             .setCustomId('tournament_review1')
                             .setLabel("QUESTA E' UN ANTEPRIMA, SOLO TU PUOI VEDERLO!")
                             .setStyle('DANGER')
                             .setDisabled(true),
                     );
-                    const rowInfo2 = new MessageActionRow()
+                    const rowInfo2 = new ActionRowBuilder()
                     .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                             .setCustomId('tournament_review2')
                             .setLabel("PREMI 'PUBBLICA' PER PUBBLICARE IL TORNEO")
                             .setStyle('DANGER')
                             .setDisabled(true),
                     );
-                    const rowInfo3 = new MessageActionRow()
+                    const rowInfo3 = new ActionRowBuilder()
                     .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                             .setCustomId('tournament_review3')
                             .setLabel("OPPURE 'RIGENERA' PER RIGENERARE LE SQUADRE")
                             .setStyle('DANGER')
                             .setDisabled(true),
                     );
-                    const row = new MessageActionRow()
+                    const row = new ActionRowBuilder()
                     .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                             .setCustomId('tournament_regen')
                             .setLabel('Rigenera')
                             .setStyle('PRIMARY'),
                     )
                     .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                             .setCustomId('tournament_publish')
                             .setLabel('Pubblica')
                             .setStyle('PRIMARY'),

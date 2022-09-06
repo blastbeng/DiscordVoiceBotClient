@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
-const { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const fs = require('fs');
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
@@ -87,9 +87,9 @@ module.exports = {
                                         options.push(option);
                                     }
                                     
-                                    const row = new MessageActionRow()
+                                    const row = new ActionRowBuilder()
                                     .addComponents(
-                                        new MessageSelectMenu()
+                                        new SelectMenuBuilder()
                                             .setCustomId('videoselect')
                                             .setPlaceholder('Seleziona un video da riprodurre')
                                             .addOptions(options),
