@@ -29,6 +29,22 @@ const path = config.CACHE_DIR;
 
 
 const player = createAudioPlayer();
+player.on('error', error => {
+    console.log(error);  
+});
+player.on(AudioPlayerStatus.Playing, () => {
+    playing = true;
+});
+player.on(AudioPlayerStatus.Idle, () => {
+    playing = false;
+});
+player.on(AudioPlayerStatus.AutoPased, () => {
+    playing = false;
+});
+player.on(AudioPlayerStatus.Paused, () => {
+    playing = false;
+});
+
 const fetch = require('node-fetch');
 
 const api=config.API_URL;
@@ -39,6 +55,7 @@ const path_music=config.API_PATH_MUSIC
 const path_text=config.API_PATH_TEXT
 
 let playing = false;
+let lastSpeech = 0;
 
 //setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
 
@@ -576,8 +593,9 @@ client.on("messageCreate", (msg) => {
             console.error(error);
         }
     });
-
   
+    
+
 client.on("speech", (msg) => {
 
     try{    
@@ -602,15 +620,27 @@ client.on("speech", (msg) => {
             // randMinutes = date_ob.getMinutes();
             // TEST
 
-            if (new RegExp('^disabilita', "i").test(wordsss)
-                || new RegExp('^disable', "i").test(wordsss)) {
-                config.AUTONOMOUS = false;
-            } else if (config.AUTONOMOUS
-                //|| randMinutes === minutes 
-                || new RegExp('^pezzente', "i").test(wordsss) 
+            var bcAuto = false;
+            var bcSpeech = false;
+
+            if(config.AUTONOMOUS) {
+                bcAuto = true;
+            } else if (new RegExp('^pezzente', "i").test(wordsss) 
                 || new RegExp('^scemo', "i").test(wordsss) 
                 || new RegExp('^bot', "i").test(wordsss) 
                 || new RegExp('^boat', "i").test(wordsss)) {
+                bcSpeech = true;
+            }
+            
+
+
+            differenctMs = (new Date()).getTime() - lastSpeech;
+
+            if (new RegExp('^disabilita', "i").test(wordsss)
+                || new RegExp('^disable', "i").test(wordsss)) {
+                config.AUTONOMOUS = false;
+            } else if ((bcAuto && (differenctMs > config.AUTONOMOUS_TIMEOUT)) || bcSpeech) {
+                lastSpeech = (new Date()).getTime();
                     
                 var words = msg.content.toLowerCase()
                 if(!config.AUTONOMOUS){
@@ -625,7 +655,14 @@ client.on("speech", (msg) => {
                 if (words === ''){
                     words = msg.content.toLowerCase();
                 }
-                var params = api+path_audio+"ask/"+words;
+
+                var params = ""
+                /**if(bcAuto) {
+                    params = api+path_audio+"ask/"+config.AUTONOMOUS_TIMEOUT+"/"+words;
+                } else {
+                    params = api+path_audio+"ask/"+words;
+                }*/
+                params = api+path_audio+"ask/"+words;
                 fetch(
                     params,
                     {
@@ -643,26 +680,10 @@ client.on("speech", (msg) => {
                         dest.on('error', reject);        
                         dest.on('finish', function(){     
                             if (!playing) {
-                                connection.subscribe(player);                       
-                                const resource = createAudioResource(outFile, {
+                                connection.subscribe(player);
+                                player.play(createAudioResource(outFile, {
                                     inputType: StreamType.Arbitrary,
-                                });
-                                player.on('error', error => {
-                                    console.log(error);  
-                                });
-                                player.on(AudioPlayerStatus.Playing, () => {
-                                    playing = true;
-                                });
-                                player.on(AudioPlayerStatus.Idle, () => {
-                                    playing = false;
-                                });
-                                player.on(AudioPlayerStatus.AutoPased, () => {
-                                    playing = false;
-                                });
-                                player.on(AudioPlayerStatus.Paused, () => {
-                                    playing = false;
-                                });
-                                player.play(resource); 
+                                }));
                             } 
                         });
                     }).catch(function(error) {

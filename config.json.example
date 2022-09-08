@@ -1,4 +1,5 @@
 {
+    "BOT_USERNAME"   : "ScemoPezzente",
     "BOT_TOKEN" : "BOT_TOKEN",
     "BOT_ID" : "BOT_ID",
     "GUILD_ID" : "GUILD_ID",
@@ -16,5 +17,5 @@
     "MAX_LISTENERS"   : 100,
     "ENABLED"   : true,
     "AUTONOMOUS"   : false,
-    "AUTONOMOUS_TIMEOUT"   : 60
+    "AUTONOMOUS_TIMEOUT"   : 60000
 }
