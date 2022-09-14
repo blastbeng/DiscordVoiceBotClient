@@ -17,5 +17,5 @@
     "MAX_LISTENERS"   : 100,
     "ENABLED"   : true,
     "AUTONOMOUS"   : false,
-    "AUTONOMOUS_TIMEOUT"   : 60000
+    "AUTONOMOUS_TIMEOUT"   : 120000
 }

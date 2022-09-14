@@ -14,29 +14,6 @@ module.exports = {
         .setDescription("Il pezzente cerca un'immagine")
         .addStringOption(option => option.setName('input').setDescription("L'immagine da cercare").setRequired(true)),
     async execute(interaction) {
-        if (interaction.member.voice === null 
-            || interaction.member.voice === undefined 
-            || interaction.member.voice.channelId === null 
-            || interaction.member.voice.channelId === undefined ){
-                interaction.reply({ content: 'Devi prima entrare in un canale vocale', ephemeral: true });
-        } else {
-            var connection = null;
-            const connection_old = getVoiceConnection(interaction.member.voice.guild.id);
-            if (connection_old !== null 
-                && connection_old !== undefined
-                && connection_old.joinConfig.channelId !== interaction.member.voice.channelId){
-                connection_old.destroy();
-            } else {
-                connection = connection_old;
-            }
-            
-            connection = joinVoiceChannel({
-                channelId: interaction.member.voice.channelId,
-                guildId: interaction.guildId,
-                adapterCreator: interaction.guild.voiceAdapterCreator,
-                selfDeaf: false,
-                selfMute: false
-            });
             //interaction.deferReply({ ephemeral: true});
             const words = interaction.options.getString('input');    
 
@@ -63,7 +40,6 @@ module.exports = {
                 console.log(error);
                 interaction.reply({ content: 'Nessun immagine trovata', ephemeral: true });   
             });  
-        }
 
     }
 }; 

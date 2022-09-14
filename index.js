@@ -32,18 +32,6 @@ const player = createAudioPlayer();
 player.on('error', error => {
     console.log(error);  
 });
-player.on(AudioPlayerStatus.Playing, () => {
-    playing = true;
-});
-player.on(AudioPlayerStatus.Idle, () => {
-    playing = false;
-});
-player.on(AudioPlayerStatus.AutoPased, () => {
-    playing = false;
-});
-player.on(AudioPlayerStatus.Paused, () => {
-    playing = false;
-});
 
 const fetch = require('node-fetch');
 
@@ -53,8 +41,6 @@ const hostname=config.API_HOSTNAME;
 const path_audio=config.API_PATH_AUDIO
 const path_music=config.API_PATH_MUSIC
 const path_text=config.API_PATH_TEXT
-
-let playing = false;
 let lastSpeech = 0;
 
 //setInterval(findRemoveSync.bind(this, path, { extensions: ['.wav', '.mp3'] }), 21600000)
@@ -679,12 +665,10 @@ client.on("speech", (msg) => {
                         res.body.on('end', () => resolve());
                         dest.on('error', reject);        
                         dest.on('finish', function(){     
-                            if (!playing) {
-                                connection.subscribe(player);
-                                player.play(createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
-                                }));
-                            } 
+                            connection.subscribe(player);
+                            player.play(createAudioResource(outFile, {
+                                inputType: StreamType.Arbitrary,
+                            }));
                         });
                     }).catch(function(error) {
                         console.log(error);
