@@ -10,4 +10,5 @@ services:
     image: "scemo-pezzente-discord:latest"
     restart: "no"
     volumes:
+      - "./config.json:/usr/src/app/config.json"
       - "/tmp/scemo-pezzente-discord:/tmp/scemo-pezzente-discord"
