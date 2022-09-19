@@ -41,58 +41,64 @@ module.exports = {
                     selfDeaf: false,
                     selfMute: false
                 });
-            //interaction.deferReply({ ephemeral: true});
-            interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {            
+            //interaction.deferReply({ ephemeral: true});       
 
-                const words = interaction.options.getString('input');
+            const words = interaction.options.getString('input');
+            
+            if (words.length <= 100) {
 
-                if(!(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(words))){
-                    var params = api+path_audio+"ask/user/"+interaction.member.user.username+"/"+encodeURIComponent(words);
+                interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {     
 
-                    fetch(
-                        params,
-                        {
-                            method: 'GET',
-                            headers: { 'Accept': '*/*' }
-                        }
-                    ).then(res => {
-                        new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
-                            var outFile = path+"/"+file;
-                            const dest = fs.createWriteStream(outFile);
-                            res.body.pipe(dest);
-                            res.body.on('end', () => resolve());
-                            dest.on('error', reject);        
+                    if(!(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(words))){
+                        var params = api+path_audio+"ask/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words);
 
-                            dest.on('finish', function(){               
-                                connection.subscribe(player);             
-                                const resource = createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
+                        fetch(
+                            params,
+                            {
+                                method: 'GET',
+                                headers: { 'Accept': '*/*' }
+                            }
+                        ).then(res => {
+                            new Promise((resolve, reject) => {
+                                //var file = Math.random().toString(36).slice(2)+".wav";
+                                var file = "temp.wav";
+                                var outFile = path+"/"+file;
+                                const dest = fs.createWriteStream(outFile);
+                                res.body.pipe(dest);
+                                res.body.on('end', () => resolve());
+                                dest.on('error', reject);        
+
+                                dest.on('finish', function(){               
+                                    connection.subscribe(player);             
+                                    const resource = createAudioResource(outFile, {
+                                        inputType: StreamType.Arbitrary,
+                                    });
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                    });
+                                    
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                    });
+                                    player.play(resource);               
                                 });
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                player.play(resource);               
-                            });
+                            }).catch(function(error) {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                            }); 
                         }).catch(function(error) {
                             console.log(error);
                             interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                        }); 
-                    }).catch(function(error) {
-                        console.log(error);
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                    });
-                } else {
-                    interaction.editReply({ content: 'Ma che c**** scrivi?!', ephemeral: true });
-                }
-            });
+                        });
+                    } else {
+                        interaction.editReply({ content: 'Ma che c**** scrivi?!', ephemeral: true });
+                    }
+                });
+            } else {
+                interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 100', ephemeral: true });    
+            }
         }
     }
 }; 

@@ -17,10 +17,12 @@ module.exports = {
         .addStringOption(option => option.setName('definition').setDescription('Definizione').setRequired(true)),
     async execute(interaction) {
         const words = interaction.options.getString('input');
+        const definition = interaction.options.getString('definition');
 
-        if(!(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(words))){
-
-            const definition = interaction.options.getString('definition');
+        if(!(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(words))
+            && !(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(definition))
+            && words.length <= 100 
+            && definition.length <= 100){
 
             var params = api+path_text+"learn/"+encodeURIComponent(words)+"/"+encodeURIComponent(definition);
 

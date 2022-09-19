@@ -42,49 +42,57 @@ module.exports = {
                 selfMute: false
             });
             //interaction.deferReply({ ephemeral: true});
-            interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {       
 
-                const words = interaction.options.getString('input');
+            const words = interaction.options.getString('input');
 
-                var params = api+path_audio+"repeat/learn/user/"+interaction.member.user.username+"/"+encodeURIComponent(words);
+            if (words.length <= 100) {
 
-                fetch(
-                    params,
-                    {
-                        method: 'GET',
-                        headers: { 'Accept': '*/*' }
-                    }
-                ).then(res => {
-                    new Promise((resolve, reject) => {
-                        //var file = Math.random().toString(36).slice(2)+".wav";
-                        var file = "temp.wav";
-                        var outFile = path+"/"+file;
-                        const dest = fs.createWriteStream(outFile);
-                        res.body.pipe(dest);
-                        res.body.on('end', () => resolve());
-                        dest.on('error', reject);
+                interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {       
 
-                        dest.on('finish', function(){      
-                            connection.subscribe(player);                      
-                            const resource = createAudioResource(outFile, {
-                                inputType: StreamType.Arbitrary,
+                    
+
+                    var params = api+path_audio+"repeat/learn/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words);
+
+                    fetch(
+                        params,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': '*/*' }
+                        }
+                    ).then(res => {
+                        new Promise((resolve, reject) => {
+                            //var file = Math.random().toString(36).slice(2)+".wav";
+                            var file = "temp.wav";
+                            var outFile = path+"/"+file;
+                            const dest = fs.createWriteStream(outFile);
+                            res.body.pipe(dest);
+                            res.body.on('end', () => resolve());
+                            dest.on('error', reject);
+
+                            dest.on('finish', function(){      
+                                connection.subscribe(player);                      
+                                const resource = createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                });
+                                
+                                player.on('error', error => {
+                                    console.log(error);
+                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                });
+                                player.play(resource);         
                             });
-                            
-                            player.on('error', error => {
-                                console.log(error);
-                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                            });
-                            player.play(resource);         
-                        });
+                        }).catch(function(error) {
+                            console.log(error);
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                        }); 
                     }).catch(function(error) {
                         console.log(error);
                         interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
                     }); 
-                }).catch(function(error) {
-                    console.log(error);
-                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                }); 
-            });
+                });
+            } else {
+                interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 100', ephemeral: true });    
+            }
         }
 
     }

@@ -21,8 +21,6 @@ module.exports = {
         .addStringOption(option => option.setName('input').setDescription('Che cosa vuoi cercare?').setRequired(true)),
     async execute(interaction) {     
 
-        const words = interaction.options.getString('input');
-
             if (interaction.member.voice === null 
                 || interaction.member.voice === undefined 
                 || interaction.member.voice.channelId === null 
@@ -46,51 +44,59 @@ module.exports = {
                     selfDeaf: false,
                     selfMute: false
                 });
-                interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {         
 
-                    var params = api+path_audio+"search/"+encodeURIComponent(words);
+                const words = interaction.options.getString('input');
 
-                    fetch(
-                        params,
-                        {
-                            method: 'GET',
-                            headers: { 'Accept': '*/*' }
-                        }
-                    ).then(res => {
-                        new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
-                            var outFile = path+"/"+file;
-                            const dest = fs.createWriteStream(outFile);
-                            res.body.pipe(dest);
-                            res.body.on('end', () => resolve());
-                            dest.on('error', reject);        
+                if (words.length <= 100) {
+                    
+                    interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {         
 
-                            dest.on('finish', function(){       
-                                connection.subscribe(player);                     
-                                const resource = createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
+                        var params = api+path_audio+"search/"+encodeURIComponent(words);
+
+                        fetch(
+                            params,
+                            {
+                                method: 'GET',
+                                headers: { 'Accept': '*/*' }
+                            }
+                        ).then(res => {
+                            new Promise((resolve, reject) => {
+                                //var file = Math.random().toString(36).slice(2)+".wav";
+                                var file = "temp.wav";
+                                var outFile = path+"/"+file;
+                                const dest = fs.createWriteStream(outFile);
+                                res.body.pipe(dest);
+                                res.body.on('end', () => resolve());
+                                dest.on('error', reject);        
+
+                                dest.on('finish', function(){       
+                                    connection.subscribe(player);                     
+                                    const resource = createAudioResource(outFile, {
+                                        inputType: StreamType.Arbitrary,
+                                    });
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                    });
+                                    
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
+                                    });
+                                    player.play(resource);                          
                                 });
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                player.play(resource);                          
-                            });
+                            }).catch(function(error) {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                            }); 
                         }).catch(function(error) {
                             console.log(error);
-                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
                         }); 
-                    }).catch(function(error) {
-                        console.log(error);
-                        interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
-                    }); 
-                });
+                    });
+                } else {
+                    interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 100', ephemeral: true });    
+                }
             }
 
     }
