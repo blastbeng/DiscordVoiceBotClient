@@ -648,7 +648,7 @@ client.on("speech", (msg) => {
                 } else {
                     params = api+path_audio+"ask/"+words;
                 }*/
-                params = api+path_audio+"ask/"+words;
+                params = api+path_audio+"ask/user/"+msg.author.username+"/"+encodeURIComponent(words);
                 fetch(
                     params,
                     {

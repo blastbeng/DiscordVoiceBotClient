@@ -22,7 +22,7 @@ module.exports = {
             interaction.reply({ content: 'Il pezzente sta cercando: "' + words + '"', ephemeral: true }).then(data => { 
                 try {
                     interaction.followUp({
-                        content: interaction.user.username + ' ha cercato: "' + words + '"',
+                        content: interaction.user.username + ' ha cercato: "' + encodeURIComponent(words) + '"',
                         files: [{
                             attachment: params,
                             name: words+'.jpg'

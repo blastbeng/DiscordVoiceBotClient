@@ -48,7 +48,7 @@ module.exports = {
                 });
                 interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {         
 
-                    var params = api+path_audio+"search/"+words;
+                    var params = api+path_audio+"search/"+encodeURIComponent(words);
 
                     fetch(
                         params,

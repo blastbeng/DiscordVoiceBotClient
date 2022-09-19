@@ -47,7 +47,7 @@ module.exports = {
                 const words = interaction.options.getString('input');
 
                 if(!(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(words))){
-                    var params = api+path_audio+"ask/"+words;
+                    var params = api+path_audio+"ask/user/"+interaction.member.user.username+"/"+encodeURIComponent(words);
 
                     fetch(
                         params,

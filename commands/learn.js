@@ -22,7 +22,7 @@ module.exports = {
 
             const definition = interaction.options.getString('definition');
 
-            var params = api+path_text+"learn/"+words+"/"+definition;
+            var params = api+path_text+"learn/"+encodeURIComponent(words)+"/"+encodeURIComponent(definition);
 
             fetch(
                 params,
