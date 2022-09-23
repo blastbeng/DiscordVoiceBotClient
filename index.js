@@ -363,8 +363,14 @@ client.on('interactionCreate', async interaction => {
                         selfMute: false
                     });
     
-    
-                    var params = api+path_audio+"insult?text=none";
+                    var guildid=""
+                    if(interaction.member.voice.guild.id === GUILD_ID){
+                        guildid="000000"
+                    }
+                    else{
+                        guildid = interaction.member.voice.guild.id
+                    }
+                    var params = api+path_audio+"insult?text=none&chatid="+encodeURIComponent(guildid);
     
     
                     fetch(
@@ -648,7 +654,14 @@ client.on("speech", (msg) => {
                 } else {
                     params = api+path_audio+"ask/"+words;
                 }*/
-                params = api+path_audio+"ask/user/"+encodeURIComponent(msg.author.username)+"/"+encodeURIComponent(words);
+                var guildid=""
+                if(msg.guild.id === GUILD_ID){
+                    guildid="000000"
+                }
+                else{
+                    guildid = msg.guild.id
+                }
+                params = api+path_audio+"ask/user/"+encodeURIComponent(msg.author.username)+"/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
                 fetch(
                     params,
                     {

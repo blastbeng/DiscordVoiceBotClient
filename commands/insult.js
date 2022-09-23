@@ -59,12 +59,19 @@ module.exports = {
                     });
                 interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true }).then(data => {    
 
+                    var guildid=""
+                    if(interaction.member.voice.guild.id === GUILD_ID){
+                        guildid="000000"
+                    }
+                    else{
+                        guildid = interaction.member.voice.guild.id
+                    }
 
                     var params = "";
                     if (words === null || words === undefined){
-                        params = api+path_audio+"insult?text=none";
+                        params = api+path_audio+"insult?text=none&chatid="+encodeURIComponent(guildid);
                     } else {
-                        params = api+path_audio+"insult?text="+encodeURIComponent(words);
+                        params = api+path_audio+"insult?text="+encodeURIComponent(words)+"&chatid="+encodeURIComponent(guildid);
                     }
 
 

@@ -6,6 +6,7 @@ const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
+const GUILD_ID = config.GUILD_ID;
 
 const path = config.CACHE_DIR;
 const api=config.API_URL;
@@ -49,9 +50,15 @@ module.exports = {
 
                 interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {       
 
-                    
+                    var guildid=""
+                    if(interaction.member.voice.guild.id === GUILD_ID){
+                        guildid="000000"
+                    }
+                    else{
+                        guildid = interaction.member.voice.guild.id
+                    }
 
-                    var params = api+path_audio+"repeat/learn/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words);
+                    var params = api+path_audio+"repeat/learn/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
 
                     fetch(
                         params,

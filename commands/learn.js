@@ -24,7 +24,14 @@ module.exports = {
             && words.length <= 100 
             && definition.length <= 100){
 
-            var params = api+path_text+"learn/"+encodeURIComponent(words)+"/"+encodeURIComponent(definition);
+            var guildid=""
+            if(interaction.member.voice.guild.id === GUILD_ID){
+                guildid="000000"
+            }
+            else{
+                guildid = interaction.member.voice.guild.id
+            }
+            var params = api+path_text+"learn/"+encodeURIComponent(words)+"/"+encodeURIComponent(definition)+"/"+encodeURIComponent(guildid);
 
             fetch(
                 params,
