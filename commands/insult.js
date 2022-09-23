@@ -16,6 +16,7 @@ const api=config.API_URL;
 const port=config.API_PORT;
 const path_audio=config.API_PATH_AUDIO
 const path_text=config.API_PATH_TEXT
+const GUILD_ID = config.GUILD_ID;
 
 
 module.exports = {

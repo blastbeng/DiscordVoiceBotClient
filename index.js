@@ -26,6 +26,7 @@ addSpeechEvent(client, { lang: "it-IT", profanityFilter: false });
 
 const TOKEN = config.BOT_TOKEN;
 const path = config.CACHE_DIR;
+const GUILD_ID = config.GUILD_ID;
 
 
 const player = createAudioPlayer();

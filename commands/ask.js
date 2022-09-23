@@ -11,6 +11,7 @@ const path = config.CACHE_DIR;
 const api=config.API_URL;
 const text="&text=";
 const path_audio=config.API_PATH_AUDIO
+const GUILD_ID = config.GUILD_ID;
 
 module.exports = {
     data: new SlashCommandBuilder()
