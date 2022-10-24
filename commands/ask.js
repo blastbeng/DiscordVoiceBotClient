@@ -46,7 +46,7 @@ module.exports = {
 
             const words = interaction.options.getString('input');
             
-            if (words.length <= 100) {
+            if (words.length <= 500) {
 
                 interaction.reply({ content: 'Il pezzente sta rispondendo', ephemeral: true }).then(data => {     
 
@@ -106,7 +106,7 @@ module.exports = {
                     }
                 });
             } else {
-                interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 100', ephemeral: true });    
+                interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 500', ephemeral: true });    
             }
         }
     }

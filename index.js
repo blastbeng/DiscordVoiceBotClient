@@ -662,7 +662,7 @@ client.on("speech", (msg) => {
                 else{
                     guildid = msg.guild.id
                 }
-                params = api+path_audio+"ask/user/"+encodeURIComponent(msg.author.username)+"/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
+                params = api+path_audio+"ask/nolearn/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
                 fetch(
                     params,
                     {
