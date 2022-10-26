@@ -17,7 +17,19 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('speak')
         .setDescription('Il pezzente parla ripetendo il testo scritto')
-        .addStringOption(option => option.setName('input').setDescription('Il testo da ripetere').setRequired(true)),
+        .addStringOption(option => option.setName('input').setDescription('Il testo da ripetere').setRequired(true))
+        .addStringOption(option =>
+            option.setName('voice')
+                .setDescription('La voce da usare')
+                .setRequired(false)
+                .addChoices(
+                    { name: 'Caparezza', value: 'TM:nk1h2vqxhzdc' },
+                    { name: 'Maria De Filippi', value: 'TM:7r48p42sbqej' },
+                    { name: 'Mario Giordano', value: 'TM:xd8srfb4v5w6' },
+                    { name: 'Gerry Scotti', value: 'TM:5ggf3m5w2mhq' },
+                    { name: 'Papa Francesco', value: 'TM:8bqjb9x51vz3' },
+                    { name: 'Silvio Berlusconi', value: 'TM:22e5sxvt2dvk' },
+                )),
     async execute(interaction) {
         if (interaction.member.voice === null 
             || interaction.member.voice === undefined 
@@ -46,6 +58,12 @@ module.exports = {
 
             const words = interaction.options.getString('input');
 
+            var voice = interaction.options.getString('voice');
+
+            if (voice === undefined || voice === null){
+                voice = "null";
+            }
+
             if (words.length <= 500) {
 
                 interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {       
@@ -58,7 +76,9 @@ module.exports = {
                         guildid = interaction.member.voice.guild.id
                     }
 
-                    var params = api+path_audio+"repeat/learn/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
+                    
+
+                    var params = api+path_audio+"repeat/learn/user/"+encodeURIComponent(interaction.member.user.username)+"/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid)+"/"+encodeURIComponent(voice);
 
                     fetch(
                         params,
