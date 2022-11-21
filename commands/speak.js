@@ -61,7 +61,7 @@ module.exports = {
             var voice = interaction.options.getString('voice');
 
             if (voice === undefined || voice === null){
-                voice = "null";
+                voice = "google";
             }
 
             if (words.length <= 500) {
