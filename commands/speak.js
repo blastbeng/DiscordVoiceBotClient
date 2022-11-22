@@ -24,9 +24,11 @@ module.exports = {
                 .setRequired(false)
                 .addChoices(
                     { name: 'Caparezza', value: 'TM:nk1h2vqxhzdc' },
+                    { name: 'Goku', value: 'TM:eb0rmkq6fxtj' },
+                    { name: 'Gerry Scotti', value: 'TM:5ggf3m5w2mhq' },   
                     { name: 'Maria De Filippi', value: 'TM:7r48p42sbqej' },
-                    { name: 'Mario Giordano', value: 'TM:xd8srfb4v5w6' },
-                    { name: 'Gerry Scotti', value: 'TM:5ggf3m5w2mhq' },
+                    { name: 'Mario Giordano', value: 'TM:xd8srfb4v5w6' },                 
+                    { name: 'Paolo Bonolis', value: 'TM:zdag8n18q9ct' },
                     { name: 'Papa Francesco', value: 'TM:8bqjb9x51vz3' },
                     { name: 'Silvio Berlusconi', value: 'TM:22e5sxvt2dvk' },
                 )),

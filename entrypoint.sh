@@ -1,3 +1,3 @@
 #!/bin/sh
-#node update_commands.js
+node update_commands.js
 NODE_ENV=production node index.js
