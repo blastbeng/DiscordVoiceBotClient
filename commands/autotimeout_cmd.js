@@ -16,7 +16,11 @@ module.exports = {
         .addIntegerOption(option => option.setName('secs').setDescription('Tempo in secondi').setRequired(true)),
     async execute(interaction) {
         const secs = interaction.options.getInteger('secs');
-        config.AUTONOMOUS_TIMEOUT=(secs*1000);
-        interaction.reply({ content: "Timeout impostato per la modalità automatica: " + secs + " secondi", ephemeral: true });
+        if (secs < 30) {
+            interaction.reply({ content: "Il timeout deve essere superiore a 30 secondi.", ephemeral: true });
+        } else {
+            config.AUTONOMOUS_TIMEOUT=(secs*1000);
+            interaction.reply({ content: "Timeout impostato per la modalità automatica: " + secs + " secondi.", ephemeral: true });
+        }
     }
 }; 

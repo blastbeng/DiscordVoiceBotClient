@@ -19,11 +19,11 @@ module.exports = {
         if(bool){
             config.ENABLED=true;
             config.AUTONOMOUS=true;
-            interaction.reply({ content: "Il bot ora risponderà a qualsiasi attivazione vocale", ephemeral: true });
+            interaction.reply({ content: "Il bot ora risponderà a qualsiasi attivazione vocale.", ephemeral: true });
         } else {
             config.ENABLED=true;
             config.AUTONOMOUS=false;
-            interaction.reply({ content: "Il pezzente ora risponderà solo se interpellato con 'scemo', 'pezzente' o 'bot'", ephemeral: true });
+            interaction.reply({ content: "Il pezzente ora risponderà solo se interpellato con 'scemo', 'pezzente' o 'bot'.", ephemeral: true });
         }
     }
 }; 
