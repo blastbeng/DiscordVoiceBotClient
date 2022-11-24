@@ -84,7 +84,7 @@ module.exports = {
 
                 if (words.length <= 500) {
 
-                    interaction.reply({ content: 'Il pezzente sta parlando \nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: ' + words + '  \nVoce: ' + voicename, ephemeral: true }).then(data => {    
+                    interaction.reply({ content: "Il pezzente sta generando l'audio\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true }).then(data => {    
 
                         if(voicetoken === "") {
                             
@@ -151,6 +151,7 @@ module.exports = {
                                                         
                                                 interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });      
                                             });
+                                            interaction.editReply({ content: "Il pezzente sta parlando\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: " + words + "  \nVoce: ", ephemeral: true });    
                                             player.play(resource);       
                                         });
                                     }).catch(function(error) {
