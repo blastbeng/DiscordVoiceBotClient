@@ -4,8 +4,6 @@ const { ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const fs = require('fs');
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
-const player = createAudioPlayer();
-const fetch = require('node-fetch');
 const http = require("http");
 
 const path = config.CACHE_DIR;
@@ -98,7 +96,7 @@ module.exports = {
                                 }
                              
                             } catch (error) {
-                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
+                                interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });
                                 console.error(error);
                             }
                         });

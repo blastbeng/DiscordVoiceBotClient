@@ -42,7 +42,7 @@ module.exports = {
             await interaction.editReply(resps);
         } catch (error) {
             console.log(error);
-            await interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+            await interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
         }
 
     }

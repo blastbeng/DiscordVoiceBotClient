@@ -85,35 +85,39 @@ module.exports = {
                             headers: { 'Accept': '*/*' }
                         }
                     ).then(res => {
-                        new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
-                            var outFile = path+"/"+file;
-                            const dest = fs.createWriteStream(outFile);
-                            res.body.pipe(dest);
-                            res.body.on('end', () => resolve());
-                            dest.on('error', reject);        
+                        if(!res.ok) {
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
+                        } else {
+                            new Promise((resolve, reject) => {
+                                //var file = Math.random().toString(36).slice(2)+".wav";
+                                var file = "temp.wav";
+                                var outFile = path+"/"+file;
+                                const dest = fs.createWriteStream(outFile);
+                                res.body.pipe(dest);
+                                res.body.on('end', () => resolve());
+                                dest.on('error', reject);        
 
 
-                            dest.on('finish', function(){      
-                                connection.subscribe(player);                      
-                                const resource = createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
+                                dest.on('finish', function(){      
+                                    connection.subscribe(player);                      
+                                    const resource = createAudioResource(outFile, {
+                                        inputType: StreamType.Arbitrary,
+                                    });
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
+                                    });
+                                    player.play(resource);      
+                                    //interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                                 });
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                player.play(resource);      
-                                //interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
-                            });
-                        }).catch(function(error) {
-                            console.log(error);
-                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                        }); 
+                            }).catch(function(error) {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
+                            }); 
+                        }
                     }).catch(function(error) {
                         console.log(error);
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
+                        interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                     }); 
                 });
             }

@@ -381,32 +381,36 @@ client.on('interactionCreate', async interaction => {
                             headers: { 'Accept': '*/*' }
                         }
                     ).then(res => {
-                        new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
-                            var outFile = path+"/"+file;
-                            const dest = fs.createWriteStream(outFile);
-                            res.body.pipe(dest);
-                            res.body.on('end', () => resolve());
-                            dest.on('error', reject);        
-    
-    
-                            dest.on('finish', function(){      
-                                connection.subscribe(player);                      
-                                const resource = createAudioResource(outFile, {
-                                    inputType: StreamType.Arbitrary,
+                        if(!res.ok) {
+                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
+                        } else {
+                            new Promise((resolve, reject) => {
+                                //var file = Math.random().toString(36).slice(2)+".wav";
+                                var file = "temp.wav";
+                                var outFile = path+"/"+file;
+                                const dest = fs.createWriteStream(outFile);
+                                res.body.pipe(dest);
+                                res.body.on('end', () => resolve());
+                                dest.on('error', reject);        
+        
+        
+                                dest.on('finish', function(){      
+                                    connection.subscribe(player);                      
+                                    const resource = createAudioResource(outFile, {
+                                        inputType: StreamType.Arbitrary,
+                                    });
+                                    player.on('error', error => {
+                                        console.log(error);
+                                        interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
+                                    });
+                                    player.play(resource);      
+                                    interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                                 });
-                                player.on('error', error => {
-                                    console.log(error);
-                                    interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                });
-                                player.play(resource);      
-                                interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true });          
-                            });
-                        }).catch(function(error) {
-                            console.log(error);
-                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                        }); 
+                            }).catch(function(error) {
+                                console.log(error);
+                                interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
+                            }); 
+                        }
                     }).catch(function(error) {
                         console.log(error);
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
@@ -451,92 +455,96 @@ client.on('interactionCreate', async interaction => {
                                 headers: { 'Accept': '*/*' }
                             }
                         ).then(res => {
-                            new Promise((resolve, reject) => {
-                                var file = "youtube.mp3";
-                                //var file = "temp.wav";
-                                var outFile = path+"/"+file;
-                                const dest = fs.createWriteStream(outFile);
-                                res.body.pipe(dest);
-                                res.body.on('end', () => resolve());
-                                dest.on('error', reject);        
+                            if(!res.ok) {
+                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
+                            } else {
+                                new Promise((resolve, reject) => {
+                                    var file = "youtube.mp3";
+                                    //var file = "temp.wav";
+                                    var outFile = path+"/"+file;
+                                    const dest = fs.createWriteStream(outFile);
+                                    res.body.pipe(dest);
+                                    res.body.on('end', () => resolve());
+                                    dest.on('error', reject);        
 
-                                dest.on('finish', function(){      
-                                    connection.subscribe(player);                      
-                                    const resource = createAudioResource(outFile, {
-                                        inputType: StreamType.Arbitrary,
-                                    });
-                                    player.on('error', error => {
-                                        console.log(error);
-                                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });     
-                                    });
-                                    player.play(resource); 
-                                    const row = new ActionRowBuilder()
-                                    .addComponents(
-                                        new ButtonBuilder()
-                                            .setCustomId('stop')
-                                            .setLabel('Stop')
-                                            .setStyle('PRIMARY'),
-                                    );
-                                    const options = {
-                                        "method": "GET",
-                                        "hostname": hostname,
-                                        "port": port,
-                                        "path": path_music+'youtube/info?url='+encodeURIComponent(video)
-                                    }
-                                    const req = http.request(options, function(res) {
-                
-                                        var chunks = [];
-                                    
-                                        req.on('error', function (error) {
+                                    dest.on('finish', function(){      
+                                        connection.subscribe(player);                      
+                                        const resource = createAudioResource(outFile, {
+                                            inputType: StreamType.Arbitrary,
+                                        });
+                                        player.on('error', error => {
                                             console.log(error);
-                                            interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                            interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
                                         });
-                                        res.on("data", function (chunk) {
-                                            chunks.push(chunk);
-                                        });
-                                    
-                                        res.on("end", function() {
-                                            try {
-                                                var body = Buffer.concat(chunks);
-                                                var object = JSON.parse(body.toString())
+                                        player.play(resource); 
+                                        const row = new ActionRowBuilder()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setCustomId('stop')
+                                                .setLabel('Stop')
+                                                .setStyle('PRIMARY'),
+                                        );
+                                        const options = {
+                                            "method": "GET",
+                                            "hostname": hostname,
+                                            "port": port,
+                                            "path": path_music+'youtube/info?url='+encodeURIComponent(video)
+                                        }
+                                        const req = http.request(options, function(res) {
+                    
+                                            var chunks = [];
+                                        
+                                            req.on('error', function (error) {
+                                                console.log(error);
+                                                interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
+                                            });
+                                            res.on("data", function (chunk) {
+                                                chunks.push(chunk);
+                                            });
+                                        
+                                            res.on("end", function() {
+                                                try {
+                                                    var body = Buffer.concat(chunks);
+                                                    var object = JSON.parse(body.toString())
+                                                    
+                                                    const rowStop = new ActionRowBuilder()
+                                                    .addComponents(
+                                                        new ButtonBuilder()
+                                                            .setCustomId('stop')
+                                                            .setLabel('Stop')
+                                                            .setStyle('PRIMARY'),
+                                                    );
+                                                    if (object.length === 0) {                                
+                                                        interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
+                                                    } else {
+                                                    var videores = object[0];
+                                                    const embed = new EmbedBuilder()
+                                                            .setColor('#0099ff')
+                                                            .setTitle(videores.title)
+                                                            .setURL(videores.link)
+                                                            .setDescription(videores.link);
+                                                    
+                                                    interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                                    }
                                                 
-                                                const rowStop = new ActionRowBuilder()
-                                                .addComponents(
-                                                    new ButtonBuilder()
-                                                        .setCustomId('stop')
-                                                        .setLabel('Stop')
-                                                        .setStyle('PRIMARY'),
-                                                );
-                                                if (object.length === 0) {                                
-                                                    interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  
-                                                } else {
-                                                var videores = object[0];
-                                                const embed = new EmbedBuilder()
-                                                        .setColor('#0099ff')
-                                                        .setTitle(videores.title)
-                                                        .setURL(videores.link)
-                                                        .setDescription(videores.link);
-                                                
-                                                interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, embeds: [embed], components: [rowStop] });  
+                                                } catch (error) {
+                                                    interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });
+                                                    console.error(error);
                                                 }
-                                            
-                                            } catch (error) {
-                                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
-                                                console.error(error);
-                                            }
-                                        });
-                                    
-                                    });        
-                                    
-                                    req.end()  
-                                });
-                            }).catch(function(error) {
-                                console.log(error);
-                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });   
-                            }); 
+                                            });
+                                        
+                                        });        
+                                        
+                                        req.end()  
+                                    });
+                                }).catch(function(error) {
+                                    console.log(error);
+                                    interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
+                                }); 
+                            }
                         }).catch(function(error) {
                             console.log(error);
-                            interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });
+                            interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });
                         });
                     } else {                
                         await interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });
@@ -662,7 +670,7 @@ client.on("speech", (msg) => {
                 else{
                     guildid = msg.guild.id
                 }
-                params = api+path_audio+"ask/nolearn/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
+                params = api+path_audio+"ask/nolearn/random/"+encodeURIComponent(words)+"/"+encodeURIComponent(guildid);
                 fetch(
                     params,
                     {
@@ -670,23 +678,27 @@ client.on("speech", (msg) => {
                         headers: { 'Accept': '*/*' }    
                     }
                 ).then(res => {
-                    new Promise((resolve, reject) => {
-                        //var file = Math.random().toString(36).slice(2)+".wav";
-                        var file = "temp.wav";
-                        var outFile = path+"/"+file;
-                        const dest = fs.createWriteStream(outFile);
-                        res.body.pipe(dest);
-                        res.body.on('end', () => resolve());
-                        dest.on('error', reject);        
-                        dest.on('finish', function(){     
-                            connection.subscribe(player);
-                            player.play(createAudioResource(outFile, {
-                                inputType: StreamType.Arbitrary,
-                            }));
-                        });
-                    }).catch(function(error) {
-                        console.log(error);
-                    }); 
+                    if(!res.ok) {
+                        console.log('Si è verificato un errore');
+                    } else {
+                        new Promise((resolve, reject) => {
+                            //var file = Math.random().toString(36).slice(2)+".wav";
+                            var file = "temp.wav";
+                            var outFile = path+"/"+file;
+                            const dest = fs.createWriteStream(outFile);
+                            res.body.pipe(dest);
+                            res.body.on('end', () => resolve());
+                            dest.on('error', reject);        
+                            dest.on('finish', function(){     
+                                connection.subscribe(player);
+                                player.play(createAudioResource(outFile, {
+                                    inputType: StreamType.Arbitrary,
+                                }));
+                            });
+                        }).catch(function(error) {
+                            console.log(error);
+                        }); 
+                    }
                 }).catch(function(error) {
                     console.log(error);
                 }); 
