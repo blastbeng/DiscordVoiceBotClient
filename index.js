@@ -4,7 +4,8 @@ const {
     Collection,
     ActionRowBuilder, 
     ButtonBuilder,
-    EmbedBuilder
+    EmbedBuilder,
+    ButtonStyle
 } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus, StreamType  } = require('@discordjs/voice');
 const { addSpeechEvent } = require("discord-speech-recognition");
@@ -275,7 +276,7 @@ client.on('interactionCreate', async interaction => {
                                 new ButtonBuilder()
                                     .setCustomId('tournament_review1')
                                     .setLabel("QUESTA E' UN ANTEPRIMA, SOLO TU PUOI VEDERLO!")
-                                    .setStyle('DANGER')
+                                    .setStyle(ButtonStyle.Danger)
                                     .setDisabled(true),
                             );
                             const rowInfo2 = new ActionRowBuilder()
@@ -283,7 +284,7 @@ client.on('interactionCreate', async interaction => {
                                 new ButtonBuilder()
                                     .setCustomId('tournament_review2')
                                     .setLabel("PREMI 'PUBBLICA' PER PUBBLICARE IL TORNEO")
-                                    .setStyle('DANGER')
+                                    .setStyle(ButtonStyle.Danger)
                                     .setDisabled(true),
                             );
                             const rowInfo3 = new ActionRowBuilder()
@@ -291,7 +292,7 @@ client.on('interactionCreate', async interaction => {
                                 new ButtonBuilder()
                                     .setCustomId('tournament_review3')
                                     .setLabel("OPPURE 'RIGENERA' PER RIGENERARE LE SQUADRE")
-                                    .setStyle('DANGER')
+                                    .setStyle(ButtonStyle.Danger)
                                     .setDisabled(true),
                             );
                             const row = new ActionRowBuilder()
@@ -299,13 +300,13 @@ client.on('interactionCreate', async interaction => {
                                 new ButtonBuilder()
                                     .setCustomId('tournament_regen')
                                     .setLabel('Rigenera')
-                                    .setStyle('PRIMARY'),
+                                    .setStyle(ButtonStyle.Primary),
                             )
                             .addComponents(
                                 new ButtonBuilder()
                                     .setCustomId('tournament_publish')
                                     .setLabel('Pubblica')
-                                    .setStyle('PRIMARY'),
+                                    .setStyle(ButtonStyle.Primary),
                             )
                             interaction.reply({ ephemeral: true, embeds: [ embed ], components: [rowInfo1,rowInfo2,rowInfo3,row] });   
                         } catch (error) {
@@ -482,7 +483,7 @@ client.on('interactionCreate', async interaction => {
                                             new ButtonBuilder()
                                                 .setCustomId('stop')
                                                 .setLabel('Stop')
-                                                .setStyle('PRIMARY'),
+                                                .setStyle(ButtonStyle.Primary),
                                         );
                                         const options = {
                                             "method": "GET",
@@ -512,7 +513,7 @@ client.on('interactionCreate', async interaction => {
                                                         new ButtonBuilder()
                                                             .setCustomId('stop')
                                                             .setLabel('Stop')
-                                                            .setStyle('PRIMARY'),
+                                                            .setStyle(ButtonStyle.Primary),
                                                     );
                                                     if (object.length === 0) {                                
                                                         interaction.editReply({ content: 'Il pezzente sta riproducendo', ephemeral: false, components: [rowStop] });  

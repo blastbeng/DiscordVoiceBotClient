@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
 
 const fs = require('fs');
@@ -23,7 +24,7 @@ function getSlashCommand() {
 
     var command = new SlashCommandBuilder()
         .setName('speak')
-        .setDescription('Il pezzente parla ripetendo il testo scritto (Usa /listvoices per una lista delle voci disponibili)')
+        .setDescription('Il pezzente parla ripetendo il testo scritto')
         .addStringOption(option => option.setName('input').setDescription('Il testo da ripetere').setRequired(true))
         .addStringOption(option =>{
             option.setName('voice')
@@ -83,7 +84,7 @@ module.exports = {
 
                 if (words.length <= 500) {
 
-                    interaction.reply({ content: 'Il pezzente sta parlando \nTesto: ' + words + '  \nVoce: ' + voicename, ephemeral: true }).then(data => {    
+                    interaction.reply({ content: 'Il pezzente sta parlando \nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: ' + words + '  \nVoce: ' + voicename, ephemeral: true }).then(data => {    
 
                         if(voicetoken === "") {
                             
@@ -110,7 +111,18 @@ module.exports = {
                                 }
                             ).then(res => {
                                 if(!res.ok) {
-                                    interaction.editReply({ content: "Si è verificato un errore\n" + "Possibile FakeYou Rate Limiting o Timeout! Riprova tra qualche minuto!" + " \nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });
+                                    res.text().then((text) => {
+                                        
+                                        const row = new ActionRowBuilder()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setCustomId('errore')
+                                                .setLabel("ERRORE! Attendi almeno altri 30 secondi.")
+                                                .setStyle(ButtonStyle.Danger)
+                                                .setDisabled(true));
+
+                                        interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });
+                                    });
                                 } else {
                                     new Promise((resolve, reject) => {
                                         //var file = Math.random().toString(36).slice(2)+".wav";
@@ -129,18 +141,42 @@ module.exports = {
                                             
                                             player.on('error', error => {
                                                 console.log(error);
-                                                interaction.editReply({ content: "Si è verificato un errore\n" + error.message +  " \nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });        
+                                                const row = new ActionRowBuilder()
+                                                .addComponents(
+                                                    new ButtonBuilder()
+                                                        .setCustomId('errore')
+                                                        .setLabel("ERRORE! Attendi almeno altri 30 secondi.")
+                                                        .setStyle(ButtonStyle.Danger)
+                                                        .setDisabled(true));
+                                                        
+                                                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });      
                                             });
                                             player.play(resource);       
                                         });
                                     }).catch(function(error) {
                                         console.log(error);
-                                        interaction.editReply({ content: "Si è verificato un errore\n" + error.message +  " \nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });     
+                                        const row = new ActionRowBuilder()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setCustomId('errore')
+                                                .setLabel("ERRORE! Attendi almeno altri 30 secondi.")
+                                                .setStyle(ButtonStyle.Danger)
+                                                .setDisabled(true));
+                                                
+                                        interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] }); 
                                     }); 
                                 }
                             }).catch(function(error) {
                                 console.log(error);
-                                interaction.editReply({ content: "Si è verificato un errore\n" + error.message +  ". \nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });     
+                                const row = new ActionRowBuilder()
+                                .addComponents(
+                                    new ButtonBuilder()
+                                        .setCustomId('errore')
+                                        .setLabel("ERRORE! Attendi almeno altri 30 secondi.")
+                                        .setStyle(ButtonStyle.Danger)
+                                        .setDisabled(true));
+                                        
+                                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });  
                             }); 
 
                             
@@ -151,7 +187,15 @@ module.exports = {
                 }
             } catch (error) {
                 console.log(error);
-                interaction.editReply({ content: "Errore!\n" + error.message +  ". \nTesto: " + words + ".  \nVoce: " + voicename +".", ephemeral: true });  
+                const row = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('errore')
+                        .setLabel("ERRORE! Attendi almeno altri 30 secondi.")
+                        .setStyle(ButtonStyle.Danger)
+                        .setDisabled(true));
+                        
+                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });  
             }
         }
 

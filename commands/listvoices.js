@@ -27,10 +27,10 @@ function getSlashCommand() {
 module.exports = {
     data: getSlashCommand(),
     async execute(interaction) {
-        await interaction.reply({ content: 'Carico la lista delle voci disponibili...', ephemeral: true });    
+        await interaction.reply({ content: 'Carico la lista delle voci disponibili...' + "\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting", ephemeral: true });    
         try {                
 
-            var resps="";
+            var resps="Ad esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\n\n";
 
             const url = api+path_utils+"fakeyou/get_voices_by_cat/Italiano";
 

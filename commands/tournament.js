@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 
 const config = require("../config.json");
 const http = require("http");
@@ -217,7 +217,7 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('tournament_review1')
                             .setLabel("QUESTA E' UN ANTEPRIMA, SOLO TU PUOI VEDERLO!")
-                            .setStyle('DANGER')
+                            .setStyle(ButtonStyle.Danger)
                             .setDisabled(true),
                     );
                     const rowInfo2 = new ActionRowBuilder()
@@ -225,7 +225,7 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('tournament_review2')
                             .setLabel("PREMI 'PUBBLICA' PER PUBBLICARE IL TORNEO")
-                            .setStyle('DANGER')
+                            .setStyle(ButtonStyle.Danger)
                             .setDisabled(true),
                     );
                     const rowInfo3 = new ActionRowBuilder()
@@ -233,7 +233,7 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('tournament_review3')
                             .setLabel("OPPURE 'RIGENERA' PER RIGENERARE LE SQUADRE")
-                            .setStyle('DANGER')
+                            .setStyle(ButtonStyle.Danger)
                             .setDisabled(true),
                     );
                     const row = new ActionRowBuilder()
@@ -241,13 +241,13 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('tournament_regen')
                             .setLabel('Rigenera')
-                            .setStyle('PRIMARY'),
+                            .setStyle(ButtonStyle.Primary),
                     )
                     .addComponents(
                         new ButtonBuilder()
                             .setCustomId('tournament_publish')
                             .setLabel('Pubblica')
-                            .setStyle('PRIMARY'),
+                            .setStyle(ButtonStyle.Primary),
                     )
                     interaction.reply({ ephemeral: true, embeds: [ embed ], components: [rowInfo1,rowInfo2,rowInfo3,row] });   
                 } catch (error) {
