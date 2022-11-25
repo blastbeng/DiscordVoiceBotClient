@@ -44,7 +44,7 @@ module.exports = {
                 selfMute: false
             });
             //interaction.deferReply({ ephemeral: true});
-            interaction.reply({ content: 'Il pezzente sta parlando', ephemeral: true }).then(data => {           
+            interaction.reply({ content: "Il pezzente sta generando l'audio", ephemeral: true }).then(data => {        
 
                 var params = api+path_jokes_audio+"random";
 
@@ -56,11 +56,14 @@ module.exports = {
                     }
                 ).then(res => {
                     if(!res.ok) {
-                        interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
+                        res.text().then((text) => {
+                            console.error("ERRORE!", text);
+                            interaction.editReply({ content: "Errore!: \n\n" + text, ephemeral: true });
+                        });       
                     } else {
                         new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
+                            var file = Math.random().toString(36).slice(2)+".wav";
+                            //var file = "temp.wav";
                             var outFile = path+"/"+file;
                             const dest = fs.createWriteStream(outFile);
                             res.body.pipe(dest);
@@ -73,18 +76,20 @@ module.exports = {
                                     inputType: StreamType.Arbitrary,
                                 });
                                 player.on('error', error => {
-                                    console.log(error);
+                                    console.error("ERRORE!", error);
                                     interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
                                 });
-                                player.play(resource);       
+                                player.play(resource);    
+                                interaction.editReply({ content: "Il pezzente sta rispondendo con qualche disagiata", ephemeral: true });  
+                                console.log("Il pezzente sta rispondendo con qualche disagiata");    
                             });
                         }).catch(function(error) {
-                            console.log(error);
+                            console.error("ERRORE!", error);
                             interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                         }); 
                     }
                 }).catch(function(error) {
-                    console.log(error);
+                    console.error("ERRORE!", error);
                     interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                 }); 
             });

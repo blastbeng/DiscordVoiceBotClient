@@ -28,16 +28,16 @@ module.exports = {
                             name: words+'.jpg'
                         }]
                     }).catch(function(error) {
-                        console.log(error);
+                        console.error("ERRORE!", error);
                         interaction.followUp({ content: 'Nessun immagine trovata', ephemeral: true });   
                     });
                 } catch (error) {
-                    console.log(error);
+                    console.error("ERRORE!", error);
                     interaction.followUp({ content: 'Nessun immagine trovata', ephemeral: true });   
                 } 
 
             }).catch(function(error) {
-                console.log(error);
+                console.error("ERRORE!", error);
                 interaction.reply({ content: 'Nessun immagine trovata', ephemeral: true });   
             });  
 

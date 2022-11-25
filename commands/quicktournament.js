@@ -96,7 +96,7 @@ module.exports = {
                     var chunks = [];
                     res.setEncoding('utf8');
                     req.on('error', function (error) {
-                        console.log(error);
+                        console.error("ERRORE!", error);
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                     });
 

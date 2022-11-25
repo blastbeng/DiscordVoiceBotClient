@@ -41,7 +41,7 @@ module.exports = {
             }
             await interaction.editReply(resps);
         } catch (error) {
-            console.log(error);
+            console.error("ERRORE!", error);
             await interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
         }
 

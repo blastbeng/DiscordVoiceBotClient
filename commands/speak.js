@@ -112,7 +112,7 @@ module.exports = {
                             ).then(res => {
                                 if(!res.ok) {
                                     res.text().then((text) => {
-                                        
+                                        console.error("ERRORE!", text);                                        
                                         const row = new ActionRowBuilder()
                                         .addComponents(
                                             new ButtonBuilder()
@@ -121,12 +121,12 @@ module.exports = {
                                                 .setStyle(ButtonStyle.Danger)
                                                 .setDisabled(true));
 
-                                        interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });
+                                        interaction.editReply({ content: "Testo: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });
                                     });
                                 } else {
                                     new Promise((resolve, reject) => {
-                                        //var file = Math.random().toString(36).slice(2)+".wav";
-                                        var file = "temp.wav";
+                                        var file = Math.random().toString(36).slice(2)+".wav";
+                                        //var file = "temp.wav";
                                         var outFile = path+"/"+file;
                                         const dest = fs.createWriteStream(outFile);
                                         res.body.pipe(dest);
@@ -140,7 +140,7 @@ module.exports = {
                                             });
                                             
                                             player.on('error', error => {
-                                                console.log(error);
+                                                console.error("ERRORE!", error);
                                                 const row = new ActionRowBuilder()
                                                 .addComponents(
                                                     new ButtonBuilder()
@@ -149,13 +149,13 @@ module.exports = {
                                                         .setStyle(ButtonStyle.Danger)
                                                         .setDisabled(true));
                                                         
-                                                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });      
+                                                interaction.editReply({ content: "Testo: " + words + " \nVoce: " + voicename + "\n\n" + error.message, ephemeral: true, components: [row] });      
                                             });
-                                            interaction.editReply({ content: "Il pezzente sta parlando\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: " + words + "  \nVoce: ", ephemeral: true });    
-                                            player.play(resource);       
+                                            interaction.editReply({ content: "Il pezzente sta parlando\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });    
+                                            player.play(resource);
                                         });
                                     }).catch(function(error) {
-                                        console.log(error);
+                                        console.error("ERRORE!", error);
                                         const row = new ActionRowBuilder()
                                         .addComponents(
                                             new ButtonBuilder()
@@ -164,11 +164,11 @@ module.exports = {
                                                 .setStyle(ButtonStyle.Danger)
                                                 .setDisabled(true));
                                                 
-                                        interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] }); 
+                                        interaction.editReply({ content: "Testo: " + words + " \nVoce: " + voicename + "\n\n" + error.message, ephemeral: true, components: [row] }); 
                                     }); 
                                 }
                             }).catch(function(error) {
-                                console.log(error);
+                                console.error("ERRORE!", error);
                                 const row = new ActionRowBuilder()
                                 .addComponents(
                                     new ButtonBuilder()
@@ -177,7 +177,7 @@ module.exports = {
                                         .setStyle(ButtonStyle.Danger)
                                         .setDisabled(true));
                                         
-                                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });  
+                                interaction.editReply({ content: "Testo: " + words + " \nVoce: " + voicename + "\n\n" + error.message, ephemeral: true, components: [row] });  
                             }); 
 
                             
@@ -187,7 +187,7 @@ module.exports = {
                     interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 500', ephemeral: true });    
                 }
             } catch (error) {
-                console.log(error);
+                console.error("ERRORE!", error);
                 const row = new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
@@ -196,7 +196,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Danger)
                         .setDisabled(true));
                         
-                interaction.editReply({ content: "\nTesto: " + words + " \nVoce: " + voicename + "\n\n" + text, ephemeral: true, components: [row] });  
+                interaction.editReply({ content: "Testo: " + words + " \nVoce: " + voicename + "\n\n" + error.message, ephemeral: true, components: [row] });  
             }
         }
 

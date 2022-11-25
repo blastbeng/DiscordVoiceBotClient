@@ -32,7 +32,7 @@ const GUILD_ID = config.GUILD_ID;
 
 const player = createAudioPlayer();
 player.on('error', error => {
-    console.log(error);  
+    console.error("ERRORE!", error);  
 });
 
 const fetch = require('node-fetch');
@@ -107,7 +107,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
                   });
           }
         }).catch(function(error) {
-            console.log(error);
+            console.error("ERRORE!", error);
         });
       }
   } catch (error) {
@@ -163,7 +163,7 @@ client.on('interactionCreate', async interaction => {
                     var chunks = [];
                     res.setEncoding('utf8');
                     req.on('error', function (error) {
-                        console.log(error);
+                        console.error("ERRORE!", error);
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                     });
 
@@ -383,11 +383,12 @@ client.on('interactionCreate', async interaction => {
                         }
                     ).then(res => {
                         if(!res.ok) {
+                            console.error("ERRORE!", text);    
                             interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
                         } else {
                             new Promise((resolve, reject) => {
-                                //var file = Math.random().toString(36).slice(2)+".wav";
-                                var file = "temp.wav";
+                                var file = Math.random().toString(36).slice(2)+".wav";
+                                //var file = "temp.wav";
                                 var outFile = path+"/"+file;
                                 const dest = fs.createWriteStream(outFile);
                                 res.body.pipe(dest);
@@ -401,19 +402,20 @@ client.on('interactionCreate', async interaction => {
                                         inputType: StreamType.Arbitrary,
                                     });
                                     player.on('error', error => {
-                                        console.log(error);
+                                        console.error("ERRORE!", error);
                                         interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
                                     });
                                     player.play(resource);      
-                                    interaction.reply({ content: 'Il pezzente sta insultando', ephemeral: true });          
+                                    console.log('Il pezzente sta insultando');
+                                    interaction.editReply({ content: 'Il pezzente sta insultando', ephemeral: true });          
                                 });
                             }).catch(function(error) {
-                                console.log(error);
+                                console.error("ERRORE!", error);
                                 interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                             }); 
                         }
                     }).catch(function(error) {
-                        console.log(error);
+                        console.error("ERRORE!", error);
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true });   
                     }); 
                 }
@@ -457,7 +459,10 @@ client.on('interactionCreate', async interaction => {
                             }
                         ).then(res => {
                             if(!res.ok) {
-                                interaction.editReply({ content: 'Si è verificato un errore', ephemeral: true });           
+                                res.text().then((text) => {
+                                    console.error("ERRORE!", text);
+                                    interaction.editReply({ content: "Errore!: \n\n" + text, ephemeral: true });
+                                });       
                             } else {
                                 new Promise((resolve, reject) => {
                                     var file = "youtube.mp3";
@@ -474,10 +479,11 @@ client.on('interactionCreate', async interaction => {
                                             inputType: StreamType.Arbitrary,
                                         });
                                         player.on('error', error => {
-                                            console.log(error);
+                                            console.error("ERRORE!", error);
                                             interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
                                         });
                                         player.play(resource); 
+                                        console.log('youtube.mp3');
                                         const row = new ActionRowBuilder()
                                         .addComponents(
                                             new ButtonBuilder()
@@ -496,7 +502,7 @@ client.on('interactionCreate', async interaction => {
                                             var chunks = [];
                                         
                                             req.on('error', function (error) {
-                                                console.log(error);
+                                                console.error("ERRORE!", error);
                                                 interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                                             });
                                             res.on("data", function (chunk) {
@@ -539,12 +545,12 @@ client.on('interactionCreate', async interaction => {
                                         req.end()  
                                     });
                                 }).catch(function(error) {
-                                    console.log(error);
+                                    console.error("ERRORE!", error);
                                     interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                                 }); 
                             }
                         }).catch(function(error) {
-                            console.log(error);
+                            console.error("ERRORE!", error);
                             interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });
                         });
                     } else {                
@@ -680,11 +686,13 @@ client.on("speech", (msg) => {
                     }
                 ).then(res => {
                     if(!res.ok) {
-                        console.log('Si è verificato un errore');
+                        res.text().then((text) => {
+                            console.error("ERRORE!", text);
+                        }); 
                     } else {
                         new Promise((resolve, reject) => {
-                            //var file = Math.random().toString(36).slice(2)+".wav";
-                            var file = "temp.wav";
+                            var file = Math.random().toString(36).slice(2)+".wav";
+                            //var file = "temp.wav";
                             var outFile = path+"/"+file;
                             const dest = fs.createWriteStream(outFile);
                             res.body.pipe(dest);
@@ -697,14 +705,16 @@ client.on("speech", (msg) => {
                                 }));
                             });
                         }).catch(function(error) {
-                            console.log(error);
+                            console.error("ERRORE!", error);
                         }); 
                     }
                 }).catch(function(error) {
-                    console.log(error);
+                    console.error("ERRORE!", error);
                 }); 
             } else if (msg.content.toLowerCase().includes('stop') || msg.content.toLowerCase().includes('ferma')) {
                     player.stop();
+            } else {
+                console.error("Speech not running.", differenctMs, bcSpeech, bcAuto, Config.AUTONOMOUS);
             } 
         }
       } catch (error) {
