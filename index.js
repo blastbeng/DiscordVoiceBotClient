@@ -714,7 +714,7 @@ client.on("speech", (msg) => {
             } else if (msg.content.toLowerCase().includes('stop') || msg.content.toLowerCase().includes('ferma')) {
                     player.stop();
             } else {
-                console.error("Speech not running.", differenctMs, bcSpeech, bcAuto, Config.AUTONOMOUS);
+                console.error("Speech not running.", differenctMs, bcSpeech, bcAuto, config.AUTONOMOUS);
             } 
         }
       } catch (error) {
