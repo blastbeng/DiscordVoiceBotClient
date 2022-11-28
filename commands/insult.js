@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 
 const fs = require('fs');
 const config = require("../config.json");
@@ -107,7 +107,7 @@ module.exports = {
                                         inputType: StreamType.Arbitrary,
                                     });
                                     player.on('error', error => {
-                                        console.error("ERRORE!", error);
+                                        console.error("ERRORE!", "["+ error + "]");
                                         interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });     
                                     });
                                     player.play(resource);      
@@ -115,12 +115,12 @@ module.exports = {
                                     console.log("Il pezzente sta insultando");          
                                 });
                             }).catch(function(error) {
-                                console.error("ERRORE!", error);
+                                console.error("ERRORE!", "["+ error + "]");
                                 interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                             }); 
                         }
                     }).catch(function(error) {
-                        console.error("ERRORE!", error);
+                        console.error("ERRORE!", "["+ error + "]");
                         interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
                     }); 
                 });

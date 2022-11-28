@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const fs = require('fs');
 const config = require("../config.json");
 const player = createAudioPlayer();

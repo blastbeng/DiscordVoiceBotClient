@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const fs = require('fs');
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
@@ -140,7 +140,7 @@ module.exports = {
                                             });
                                             
                                             player.on('error', error => {
-                                                console.error("ERRORE!", error);
+                                                console.error("ERRORE!", "["+ error + "]");
                                                 const row = new ActionRowBuilder()
                                                 .addComponents(
                                                     new ButtonBuilder()
@@ -153,9 +153,10 @@ module.exports = {
                                             });
                                             interaction.editReply({ content: "Il pezzente sta parlando\nAd esclusione di google, tutte le voci sono fornite da fakeyou con possibile Rate Limiting\nTesto: " + words + "  \nVoce: " + voicename, ephemeral: true });    
                                             player.play(resource);
+                                            console.log("Il pezzente sta parlando", "[username: " + interaction.member.user.username +"]", "[words: " + words +"]", "[voicename: "+ voicename +"]");  
                                         });
                                     }).catch(function(error) {
-                                        console.error("ERRORE!", error);
+                                        console.error("ERRORE!", "["+ error + "]");
                                         const row = new ActionRowBuilder()
                                         .addComponents(
                                             new ButtonBuilder()
@@ -168,7 +169,7 @@ module.exports = {
                                     }); 
                                 }
                             }).catch(function(error) {
-                                console.error("ERRORE!", error);
+                                console.error("ERRORE!", "["+ error + "]");
                                 const row = new ActionRowBuilder()
                                 .addComponents(
                                     new ButtonBuilder()
@@ -187,7 +188,7 @@ module.exports = {
                     interaction.reply({ content: 'Errore! Caratteri massimi consentiti: 500', ephemeral: true });    
                 }
             } catch (error) {
-                console.error("ERRORE!", error);
+                console.error("ERRORE!", "["+ error + "]");
                 const row = new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()

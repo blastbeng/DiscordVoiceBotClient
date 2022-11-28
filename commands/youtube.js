@@ -5,7 +5,7 @@ const fs = require('fs');
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 const http = require("http");
-
+require( 'console-stamp' )( console );
 const path = config.CACHE_DIR;
 const api=config.API_URL;
 const port=config.API_PORT;
@@ -58,7 +58,7 @@ module.exports = {
                     const req = http.request(options, function(res) {
                         
                         req.on('error', function (error) {
-                            console.error("ERRORE!", error);
+                            console.error("ERRORE!", "["+ error + "]");
                             interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                         });
                         var chunks = [];

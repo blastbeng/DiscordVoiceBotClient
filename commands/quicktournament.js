@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const config = require("../config.json");
 const http = require("http");
 
@@ -96,7 +96,7 @@ module.exports = {
                     var chunks = [];
                     res.setEncoding('utf8');
                     req.on('error', function (error) {
-                        console.error("ERRORE!", error);
+                        console.error("ERRORE!", "["+ error + "]");
                         interaction.reply({ content: 'Si è verificato un errore', ephemeral: true }); 
                     });
 

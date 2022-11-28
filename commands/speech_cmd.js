@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
+require( 'console-stamp' )( console );
 const fs = require('fs');
 const config = require("../config.json");
 const fetch = require('node-fetch');

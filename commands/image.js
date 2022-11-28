@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection  } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
 
@@ -28,16 +28,16 @@ module.exports = {
                             name: words+'.jpg'
                         }]
                     }).catch(function(error) {
-                        console.error("ERRORE!", error);
+                        console.error("ERRORE!", "["+ error + "]");
                         interaction.followUp({ content: 'Nessun immagine trovata', ephemeral: true });   
                     });
                 } catch (error) {
-                    console.error("ERRORE!", error);
+                    console.error("ERRORE!", "["+ error + "]");
                     interaction.followUp({ content: 'Nessun immagine trovata', ephemeral: true });   
                 } 
 
             }).catch(function(error) {
-                console.error("ERRORE!", error);
+                console.error("ERRORE!", "["+ error + "]");
                 interaction.reply({ content: 'Nessun immagine trovata', ephemeral: true });   
             });  
 

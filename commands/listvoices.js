@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType  } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const fs = require('fs');
 const config = require("../config.json");
 require('events').EventEmitter.prototype._maxListeners = config.MAX_LISTENERS;
@@ -41,7 +41,7 @@ module.exports = {
             }
             await interaction.editReply(resps);
         } catch (error) {
-            console.error("ERRORE!", error);
+            console.error("ERRORE!", "["+ error + "]");
             await interaction.editReply({ content: 'Si è verificato un errore\n' + error.message, ephemeral: true });   
         }
 

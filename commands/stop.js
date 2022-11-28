@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getVoiceConnection, createAudioPlayer } = require('@discordjs/voice');
-
+require( 'console-stamp' )( console );
 const player = createAudioPlayer();
 const fetch = require('node-fetch');
 
